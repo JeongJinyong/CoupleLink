@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">CoupleLink</string>
+
+
+    <string name="view_email">이메일</string>
+    <string name="view_pw">비밀번호</string>
+    <string name="view_pwok">비밀번호 확인</string>
+    <string name="view_name">이름 및 닉네임(8자이하)</string>
+    <string name="view_signup">회원가입</string>
+    <string name="view_emailsave">이메일저장</string>
+    <string name="view_autologin">자동로그인</string>
+    <string name="view_login">로그인</string>
+    <string name="view_infofind">ID/PW찾기</string>
+
+    <string name="error_email_already">이메일 주소가 이미 사용중인 주소입니다.</string>
+
+    <string name="toast_signup_complete">회원가입 되었습니다..</string>
+
 </resources>

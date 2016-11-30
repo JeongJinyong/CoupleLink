@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1019437250902",
+    "firebase_url": "https://couplelink-343ae.firebaseio.com",
+    "project_id": "couplelink-343ae",
+    "storage_bucket": "couplelink-343ae.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019437250902:android:21b2f606767f8393",
+        "android_client_info": {
+          "package_name": "link.couple.jin.couplelink"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1019437250902-ht4sa5isfaveghk99d3ji6n531tbe8oj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVbQ-Na4BAauUNG-EMjQ-z4-YjIfXb2oE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

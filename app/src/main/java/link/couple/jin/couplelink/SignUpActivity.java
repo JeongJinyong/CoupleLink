@@ -1,0 +1,173 @@
+package link.couple.jin.couplelink;
+
+import android.graphics.Color;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+/** 회원가입 페이지
+ * Created by jin on 2016-11-29.
+ */
+
+public class SignUpActivity extends MainClass{
+
+    private FirebaseAuth firebaseAuth;
+    private DatabaseReference databaseReference;
+
+    private EditText signup_email;
+    private EditText signup_pw;
+    private EditText signup_pwok;
+    private EditText signup_name;
+    private Button signup_btn;
+
+    private boolean isPwdconfirm = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.signup_activity);
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        signup_email = (EditText)findViewById(R.id.signup_email);
+        signup_pw = (EditText)findViewById(R.id.signup_pw);
+        signup_pwok = (EditText)findViewById(R.id.signup_pwok);
+        signup_name = (EditText)findViewById(R.id.signup_name);
+        signup_btn = (Button) findViewById(R.id.signup_btn);
+
+        signup_email.setText("image_5956@naver.com");
+        signup_pw.setText("5659kh");
+        signup_pwok.setText("5659kh");
+        signup_name.setText("정진용");
+        isPwdconfirm = true;
+
+        /**
+         * 비밀번호 일치 검사
+         * 참고 : http://cocomo.tistory.com/387
+         */
+        signup_pwok.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String password = signup_pw.getText().toString();
+                String password_ok = signup_pwok.getText().toString();
+
+                if( password.equals(password_ok) ) {
+                    signup_pw.setBackgroundColor(Color.GREEN);
+                    signup_pwok.setBackgroundColor(Color.GREEN);
+                    isPwdconfirm = true;
+                } else {
+                    signup_pw.setBackgroundColor(Color.RED);
+                    signup_pwok.setBackgroundColor(Color.RED);
+                    isPwdconfirm = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+        //[END TextChangedListener]
+
+        /**
+         * 회원가입 버튼 액션
+         * 참고 : http://cocomo.tistory.com/387
+         */
+        signup_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String email = signup_email.getText().toString();
+                String password = signup_pw.getText().toString();
+                String username = signup_name.getText().toString();
+
+                // 이메일 입력 확인
+                if( email.length() == 0 ) {
+                    Toast.makeText(SignUpActivity.this, "이메일을 입력하세요!", Toast.LENGTH_SHORT).show();
+                    signup_email.requestFocus();
+                    return;
+                }
+
+                // 비밀번호 입력 확인
+                if( password.length() == 0 ) {
+                    Toast.makeText(SignUpActivity.this, "비밀번호를 입력하세요!", Toast.LENGTH_SHORT).show();
+                    signup_pw.requestFocus();
+                    return;
+                }
+
+                // 비밀번호 확인 입력 확인
+                if( signup_pwok.getText().toString().length() == 0 ) {
+                    Toast.makeText(SignUpActivity.this, "비밀번호 확인을 입력하세요!", Toast.LENGTH_SHORT).show();
+                    signup_pwok.requestFocus();
+                    return;
+                }
+
+                // 이름 및 닉네임 입력 확인
+                if( username.length() == 0 ) {
+                    Toast.makeText(SignUpActivity.this, "이름 및 닉네임을 입력하세요!", Toast.LENGTH_SHORT).show();
+                    signup_name.requestFocus();
+                    return;
+                }
+
+                // 비밀번호 일치 확인
+                if( !isPwdconfirm ) {
+                    Toast.makeText(SignUpActivity.this, "비밀번호가 일치하지 않습니다!", Toast.LENGTH_SHORT).show();
+                    signup_pwok.requestFocus();
+                    return;
+                }
+
+                signUpUser(email, password, username);
+
+            }
+        });
+        //[END OnClickListener]
+    }
+
+    /**
+     * 회원가입 메서드
+     * 참고 :
+     *      http://blog.naver.com/mingkeymagic/220716442524
+     *      https://firebase.google.com/docs/database/android/read-and-write
+     * @param email
+     * @param password
+     * @param username
+     */
+    public void signUpUser(final String email, final String password, final String username){
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    FirebaseUser user = task.getResult().getUser();
+                    UserClass userModel = new UserClass(username,email);
+                    databaseReference.child("user").child(user.getUid()).setValue(userModel);
+                    Toast.makeText(SignUpActivity.this,R.string.toast_signup_complete,Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+        }).addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                e.printStackTrace();
+                if(e.getMessage().contains("email"))
+                    Toast.makeText(SignUpActivity.this,R.string.error_email_already,Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(SignUpActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+}
