@@ -6,7 +6,6 @@
     android:weightSum="10">
 
     <TextView
-        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="3"
@@ -28,7 +27,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:hint="@string/view_email"
-            android:inputType="textPersonName" />
+            android:inputType="textEmailAddress" />
     </LinearLayout>
 
     <LinearLayout

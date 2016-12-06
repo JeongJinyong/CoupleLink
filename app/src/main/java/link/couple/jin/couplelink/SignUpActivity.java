@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
@@ -68,12 +69,12 @@ public class SignUpActivity extends MainClass{
                 String password_ok = signup_pwok.getText().toString();
 
                 if( password.equals(password_ok) ) {
-                    signup_pw.setBackgroundColor(Color.GREEN);
-                    signup_pwok.setBackgroundColor(Color.GREEN);
+                    signup_pw.setError(null);
+                    signup_pwok.setError(null);
                     isPwdconfirm = true;
                 } else {
-                    signup_pw.setBackgroundColor(Color.RED);
-                    signup_pwok.setBackgroundColor(Color.RED);
+                    signup_pw.setError(util.getStringResources(R.string.error_pw_notmatch));
+                    signup_pwok.setError(util.getStringResources(R.string.error_pw_notmatch));
                     isPwdconfirm = false;
                 }
             }
@@ -96,37 +97,37 @@ public class SignUpActivity extends MainClass{
                 String username = signup_name.getText().toString();
 
                 // 이메일 입력 확인
-                if( email.length() == 0 ) {
-                    Toast.makeText(SignUpActivity.this, "이메일을 입력하세요!", Toast.LENGTH_SHORT).show();
+                if( TextUtils.isEmpty(email) ) {
+                    signup_email.setError(util.getStringResources(R.string.edit_email_notinput));
                     signup_email.requestFocus();
                     return;
                 }
 
                 // 비밀번호 입력 확인
-                if( password.length() == 0 ) {
-                    Toast.makeText(SignUpActivity.this, "비밀번호를 입력하세요!", Toast.LENGTH_SHORT).show();
+                if( TextUtils.isEmpty(password) ) {
+                    signup_pw.setError(util.getStringResources(R.string.edit_pw_notinput));
                     signup_pw.requestFocus();
                     return;
                 }
 
                 // 비밀번호 확인 입력 확인
-                if( signup_pwok.getText().toString().length() == 0 ) {
-                    Toast.makeText(SignUpActivity.this, "비밀번호 확인을 입력하세요!", Toast.LENGTH_SHORT).show();
+                if( TextUtils.isEmpty(signup_pwok.getText().toString()) ) {
+                    signup_pwok.setError(util.getStringResources(R.string.edit_pw_notinput));
                     signup_pwok.requestFocus();
                     return;
                 }
 
                 // 이름 및 닉네임 입력 확인
-                if( username.length() == 0 ) {
-                    Toast.makeText(SignUpActivity.this, "이름 및 닉네임을 입력하세요!", Toast.LENGTH_SHORT).show();
+                if( TextUtils.isEmpty(username) ) {
+                    signup_name.setError(util.getStringResources(R.string.edit_email_notinput));
                     signup_name.requestFocus();
                     return;
                 }
 
                 // 비밀번호 일치 확인
                 if( !isPwdconfirm ) {
-                    Toast.makeText(SignUpActivity.this, "비밀번호가 일치하지 않습니다!", Toast.LENGTH_SHORT).show();
-                    signup_pwok.requestFocus();
+                    signup_pw.setError(util.getStringResources(R.string.edit_pw_notinput));
+                    signup_pwok.setError(util.getStringResources(R.string.edit_pw_notinput));
                     return;
                 }
 
@@ -162,7 +163,10 @@ public class SignUpActivity extends MainClass{
         }).addOnFailureListener(this, new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                e.printStackTrace();
+                util.log("e",e.getMessage());
+                /**
+                 * 여기 에러코드를 알아보자 정녕 에러메세지로만 오류를 뿌려줘야할지 고민좀 해보자
+                 */
                 if(e.getMessage().contains("email"))
                     Toast.makeText(SignUpActivity.this,R.string.error_email_already,Toast.LENGTH_SHORT).show();
                 else
