@@ -26,8 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class SignUpActivity extends MainClass{
 
-    private FirebaseAuth firebaseAuth;
-    private DatabaseReference databaseReference;
+
 
     private EditText signup_email;
     private EditText signup_pw;
@@ -41,7 +40,6 @@ public class SignUpActivity extends MainClass{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup_activity);
-        firebaseAuth = FirebaseAuth.getInstance();
 
         signup_email = (EditText)findViewById(R.id.signup_email);
         signup_pw = (EditText)findViewById(R.id.signup_pw);
@@ -50,8 +48,8 @@ public class SignUpActivity extends MainClass{
         signup_btn = (Button) findViewById(R.id.signup_btn);
 
         signup_email.setText("image_5956@naver.com");
-        signup_pw.setText("5659kh");
-        signup_pwok.setText("5659kh");
+        signup_pw.setText("1234");
+        signup_pwok.setText("1234");
         signup_name.setText("정진용");
         isPwdconfirm = true;
 
@@ -119,7 +117,7 @@ public class SignUpActivity extends MainClass{
 
                 // 이름 및 닉네임 입력 확인
                 if( TextUtils.isEmpty(username) ) {
-                    signup_name.setError(util.getStringResources(R.string.edit_email_notinput));
+                    signup_name.setError(util.getStringResources(R.string.edit_email_name));
                     signup_name.requestFocus();
                     return;
                 }
@@ -148,7 +146,6 @@ public class SignUpActivity extends MainClass{
      * @param username
      */
     public void signUpUser(final String email, final String password, final String username){
-        databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
