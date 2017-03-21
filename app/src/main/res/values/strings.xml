@@ -11,10 +11,12 @@
     <string name="view_autologin">자동로그인</string>
     <string name="view_login">로그인</string>
     <string name="view_infofind">ID/PW찾기</string>
+    <string name="view_invite">커플초대</string>
+    <string name="view_apply">커플신청</string>
 
     <string name="edit_email_notinput">이메일을 입력해주세요.</string>
     <string name="edit_pw_notinput">비밀번호를 입력해주세요.</string>
-    <string name="edit_name_notinput">이름 및 닉네임을 입력해주세요.</string>
+    <string name="edit_email_name">이름을 입력해주세요.</string>
 
     <string name="error_email_already">이메일 주소가 이미 사용중인 주소입니다.</string>
     <string name="error_pw_notmatch">비밀번호가 일치하지 않습니다.</string>
