@@ -20,6 +20,11 @@
 
     <string name="error_email_already">이메일 주소가 이미 사용중인 주소입니다.</string>
     <string name="error_pw_notmatch">비밀번호가 일치하지 않습니다.</string>
+    <string name="error_pw_short">비밀번호는 6자리 이상 설정해야합니다.</string>
+
+    <string name="error_connect_couple">해당 회원은 이미 커플 상태입니다.</string>
+    <string name="error_connect_apply">해당 회원은 이미 커플신청을 받았습니다.\n확인하여 주시기 바랍니다.</string>
+    <string name="error_connect_email">이메일이 존재하지 않습니다.\n확인하여 주시기 바랍니다.</string>
 
     <string name="toast_signup_complete">회원가입 되었습니다.</string>
 

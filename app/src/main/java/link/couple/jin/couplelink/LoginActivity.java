@@ -15,6 +15,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
+import org.json.JSONObject;
+
+import java.util.Iterator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,7 +53,8 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
         loginLoginBtn.setOnClickListener(this);
         loginFindBtn.setOnClickListener(this);
         loginSignupBtn.setOnClickListener(this);
-
+        loginEmailEdit.setText("image_5956@naver.com");
+        loginPwEdit.setText("123456");
 
         // [START initialize_auth]
         firebaseAuth = FirebaseAuth.getInstance();
@@ -67,6 +75,28 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
             }
         };
         // [END auth_state_listener]
+
+        databaseReference.child("user").addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        try {
+                            JSONObject user_data = new JSONObject(dataSnapshot.getValue().toString());
+                            Iterator i = user_data.keys();
+                            while (i.hasNext()) {
+                                util.log("e",i.next().toString());
+                            }
+                        } catch (Exception e) {
+                            util.log("e", e.getMessage());
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        util.log("e", databaseError.toString());
+                    }
+                }
+        );
+
     }
 
     private void signIn(String email, String password) {
@@ -82,7 +112,33 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         util.log("e", "signInWithEmail:onComplete:" + task.isSuccessful());
-                        hideProgressDialog();
+                        databaseReference.child("user").child(task.getResult().getUser().getUid()).addListenerForSingleValueEvent(
+                                new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        try {
+                                            JSONObject user_data = new JSONObject(dataSnapshot.getValue().toString());
+                                            if(user_data.getBoolean("isCouple")){
+
+                                            }else{
+                                                if(user_data.isNull("couple")){
+                                                    Intent intent = new Intent(LoginActivity.this, CoupleconnectActivity.class);
+                                                    startActivity(intent);
+                                                }else{
+
+                                                }
+                                            }
+                                            hideProgressDialog();
+                                        } catch (Exception e) {
+                                            util.log("e", e.getMessage());
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        util.log("e", databaseError.toString());
+                                    }
+                                });
                     }
                 }).addOnFailureListener(this, new OnFailureListener() {
             @Override

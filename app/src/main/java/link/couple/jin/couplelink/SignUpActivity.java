@@ -8,7 +8,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -19,6 +18,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import link.couple.jin.couplelink.data.UserClass;
 
 /**
  * 회원가입 페이지
@@ -47,8 +47,8 @@ public class SignUpActivity extends MainClass {
         ButterKnife.bind(this);
 
         signupEmail.setText("image_5956@naver.com");
-        signupPw.setText("1234");
-        signupPwok.setText("1234");
+        signupPw.setText("123456");
+        signupPwok.setText("123456");
         signupName.setText("정진용");
         isPwdconfirm = true;
 
@@ -130,6 +130,9 @@ public class SignUpActivity extends MainClass {
                     return;
                 }
 
+                if(signupPw.length() > 6){
+                    Toast.makeText(SignUpActivity.this, R.string.error_pw_short, Toast.LENGTH_SHORT).show();
+                }
                 signUpUser(email, password, username);
 
             }
@@ -153,7 +156,7 @@ public class SignUpActivity extends MainClass {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     FirebaseUser user = task.getResult().getUser();
-                    UserClass userModel = new UserClass(username, email);
+                    UserClass userModel = new UserClass(username, email, "", false);
                     databaseReference.child("user").child(user.getUid()).setValue(userModel);
                     Toast.makeText(SignUpActivity.this, R.string.toast_signup_complete, Toast.LENGTH_SHORT).show();
                     finish();

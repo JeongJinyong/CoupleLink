@@ -15,7 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class MainClass extends Activity implements MainInterface {
 
     public ProgressDialog mProgressDialog;
-    Util util;
+    public Util util;
 
     FirebaseAuth firebaseAuth;
     DatabaseReference databaseReference;
