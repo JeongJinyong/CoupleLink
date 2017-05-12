@@ -21,13 +21,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONObject;
 
-import java.util.Iterator;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by jin on 2016-11-24.
+ * 로그인엑티비티
  */
 
 public class LoginActivity extends MainClass implements View.OnClickListener {
@@ -75,28 +73,6 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
             }
         };
         // [END auth_state_listener]
-
-        databaseReference.child("user").addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        try {
-                            JSONObject user_data = new JSONObject(dataSnapshot.getValue().toString());
-                            Iterator i = user_data.keys();
-                            while (i.hasNext()) {
-                                util.log("e",i.next().toString());
-                            }
-                        } catch (Exception e) {
-                            util.log("e", e.getMessage());
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        util.log("e", databaseError.toString());
-                    }
-                }
-        );
-
     }
 
     private void signIn(String email, String password) {
@@ -117,15 +93,15 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         try {
-                                            JSONObject user_data = new JSONObject(dataSnapshot.getValue().toString());
-                                            if(user_data.getBoolean("isCouple")){
-
+                                            userLogin = new JSONObject(dataSnapshot.getValue().toString());
+                                            if(userLogin.getBoolean("isCouple")){
+                                                //커플은 커플페이지로
                                             }else{
-                                                if(user_data.isNull("couple")){
+                                                if(userLogin.isNull("couple")){
                                                     Intent intent = new Intent(LoginActivity.this, CoupleconnectActivity.class);
                                                     startActivity(intent);
                                                 }else{
-
+                                                    //커플신청이 있으면 커플수락페이지로
                                                 }
                                             }
                                             hideProgressDialog();

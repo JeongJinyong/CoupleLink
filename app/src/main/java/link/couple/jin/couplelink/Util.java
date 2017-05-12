@@ -2,6 +2,7 @@ package link.couple.jin.couplelink;
 
 import android.content.Context;
 import android.telephony.TelephonyManager;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 
 /**
- * Created by jin on 2016-12-06.
+ * 이곳저곳 쓰게될 메서드들은 모아두자
  */
 
 public class Util {
@@ -94,6 +95,12 @@ public class Util {
         return deviceId;
     }
 
+    /**
+     * Json을 Map형태로 변경
+     * @param object
+     * @return
+     * @throws JSONException
+     */
     public Map<String, Object> toMap(JSONObject object) throws JSONException {
         Map<String, Object> map = new HashMap<String, Object>();
 
@@ -114,6 +121,12 @@ public class Util {
         return map;
     }
 
+    /**
+     * JsonArray를 MapList형태로 변경
+     * @param array
+     * @return
+     * @throws JSONException
+     */
     public List<Object> toList(JSONArray array) throws JSONException {
         List<Object> list = new ArrayList<Object>();
         for(int i = 0; i < array.length(); i++) {
@@ -130,4 +143,17 @@ public class Util {
         return list;
     }
 
+    /**
+     * Base64 인코딩
+     */
+    public static String getBase64encode(String content){
+        return Base64.encodeToString(content.getBytes(), 0);
+    }
+
+    /**
+     * Base64 디코딩
+     */
+    public static String getBase64decode(String content){
+        return new String(Base64.decode(content, 0));
+    }
 }

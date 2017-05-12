@@ -22,7 +22,6 @@ import link.couple.jin.couplelink.data.UserClass;
 
 /**
  * 회원가입 페이지
- * Created by jin on 2016-11-29.
  */
 
 public class SignUpActivity extends MainClass {
@@ -156,8 +155,8 @@ public class SignUpActivity extends MainClass {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     FirebaseUser user = task.getResult().getUser();
-                    UserClass userModel = new UserClass(username, email, "", false);
-                    databaseReference.child("user").child(user.getUid()).setValue(userModel);
+                    UserClass userModel = new UserClass(username,  "", false);
+                    databaseReference.child("user").child(util.getBase64encode(email)).setValue(userModel);
                     Toast.makeText(SignUpActivity.this, R.string.toast_signup_complete, Toast.LENGTH_SHORT).show();
                     finish();
                 }
