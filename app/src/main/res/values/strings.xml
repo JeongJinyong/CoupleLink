@@ -22,10 +22,18 @@
     <string name="error_pw_notmatch">비밀번호가 일치하지 않습니다.</string>
     <string name="error_pw_short">비밀번호는 6자리 이상 설정해야합니다.</string>
 
-    <string name="error_connect_couple">해당 회원은 이미 커플 상태입니다.</string>
+    <string name="error_connect_couple">해당 회원은 이미 커플입니다.</string>
     <string name="error_connect_apply">해당 회원은 이미 커플신청을 받았습니다.\n확인하여 주시기 바랍니다.</string>
     <string name="error_connect_email">이메일이 존재하지 않습니다.\n확인하여 주시기 바랍니다.</string>
 
     <string name="toast_signup_complete">회원가입 되었습니다.</string>
+
+    <string name="permission_sms">커플 SMS초대시 문자보내기 권한이 필요합니다.</string>
+    <string name="permission_sms_setting">왜 거부하셨어요...\n권한이 없으면 카카오톡 초대밖에 사용하지 못한답니다.\n하지만 [설정] > [권한] 에서 권한을 허용할 수 있어요.</string>
+
+    <string name="permission_phone">커플신청시 고유값을 위해 디바이스ID를 사용하고 있습니다.</string>
+    <string name="permission_phone_setting">권한이 없으면 커플신청이 불가능 합니다.\n하지만 [설정] > [권한] 에서 권한을 허용할 수 있어요.</string>
+
+    <string name="kakao_app_key">3591656e665defc7ca7606a6c1dade3a</string>
 
 </resources>

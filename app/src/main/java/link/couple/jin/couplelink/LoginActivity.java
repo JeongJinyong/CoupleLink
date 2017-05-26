@@ -112,7 +112,7 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
                                     }
                                     @Override
                                     public void onCancelled(DatabaseError databaseError) {
-                                        util.log("e", databaseError.toString());
+                                        util.log("e", databaseError.toString()+"//"+databaseError.getCode()+"//"+databaseError.getDetails()+"//"+databaseError.getMessage());
                                     }
                                 });
                     }
@@ -156,7 +156,28 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.login_login_btn) {
-            signIn(loginEmailEdit.getText().toString(), loginPwEdit.getText().toString());
+            databaseReference.child("user").orderByChild("email").equalTo(loginEmailEdit.getText().toString()).addListenerForSingleValueEvent(
+                    new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            try {
+                                //데이터를 어떻게 가공할지 생각해보면됨
+                                util.log("e", dataSnapshot.getValue().toString());
+                                JSONObject jsonObject = new JSONObject(dataSnapshot.getValue().toString().replace("=",":"));
+                                util.log("e", jsonObject.toString());
+                            } catch (Exception e) {
+                                util.log("e", e.getMessage());
+                            }
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            util.log("e", databaseError.toString());
+                        }
+                    }
+            );
+
+            return;
+//            signIn(loginEmailEdit.getText().toString(), loginPwEdit.getText().toString());
         }
         if (i == R.id.login_signup_btn) {
             Intent intent = new Intent(this, SignUpActivity.class);

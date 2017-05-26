@@ -8,11 +8,13 @@ import android.support.annotation.NonNull;
 
 public class UserClass {
 
+    public String email;
     public String username;
     public String couple = "";
     public boolean isCouple = false;
 
-    public UserClass(@NonNull String username, @NonNull String couple, @NonNull boolean isCouple){
+    public UserClass(@NonNull String email, @NonNull String username, @NonNull String couple, @NonNull boolean isCouple){
+        this.email = email;
         this.username = username;
         this.couple = couple;
         this.isCouple = isCouple;

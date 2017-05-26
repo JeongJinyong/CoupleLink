@@ -13,7 +13,7 @@ import android.widget.Toast;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
+
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
@@ -45,7 +45,6 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
 
     JSONObject user_data;
     String email = "";
-    Gson gson = new Gson();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +53,25 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
         applyCoupleInvite.setOnClickListener(this);
         applyCoupleApply.setOnClickListener(this);
         applyEmail.setText("image5956@naver.com");
+
+        databaseReference.child("user").child(util.getBase64decode(applyEmail.getText().toString())).addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        try {
+                            UserClass userClass = dataSnapshot.getValue(UserClass.class);
+                            util.log("e", dataSnapshot.getValue().toString());
+                        } catch (Exception e) {
+                            util.log("e", e.getMessage());
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        util.log("e", databaseError.toString());
+                    }
+                }
+        );
+
     }
 
     @Override
@@ -106,11 +124,12 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
 
     private void coupleConnect(){
         showProgressDialog();
-        databaseReference.child("user").addListenerForSingleValueEvent(
+        databaseReference.child("user").child(util.getBase64encode(email)).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         try {
+
                             UserClass userClass = dataSnapshot.getValue(UserClass.class);
                             String data = dataSnapshot.getValue().toString().replace("=",":");
                             data = "{"+data.substring(1,data.length()-1).replace("{","[{").replace("}","}]")+"}";

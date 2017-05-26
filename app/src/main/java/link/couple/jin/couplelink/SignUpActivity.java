@@ -155,8 +155,8 @@ public class SignUpActivity extends MainClass {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     FirebaseUser user = task.getResult().getUser();
-                    UserClass userModel = new UserClass(username,  "", false);
-                    databaseReference.child("user").child(util.getBase64encode(email)).setValue(userModel);
+                    UserClass userModel = new UserClass(email,username,  "", false);
+                    databaseReference.child("user").child(user.getUid()).setValue(userModel);
                     Toast.makeText(SignUpActivity.this, R.string.toast_signup_complete, Toast.LENGTH_SHORT).show();
                     finish();
                 }
