@@ -60,7 +60,7 @@ public class CoupleapplyActivity extends MainClass {
                         }
                         hideProgressDialog();
                     }
-
+        
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Toast.makeText(CoupleapplyActivity.this, R.string.error_connect_email, Toast.LENGTH_SHORT).show();
