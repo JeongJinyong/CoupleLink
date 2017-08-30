@@ -1,8 +1,10 @@
 package link.couple.jin.couplelink;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +25,7 @@ import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import link.couple.jin.couplelink.data.UserClass;
 
 /**
  * 로그인엑티비티
@@ -51,7 +54,7 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
         loginLoginBtn.setOnClickListener(this);
         loginFindBtn.setOnClickListener(this);
         loginSignupBtn.setOnClickListener(this);
-        loginEmailEdit.setText("image_5956@naver.com");
+        loginEmailEdit.setText("image5956@naver.com");
         loginPwEdit.setText("123456");
 
         // [START initialize_auth]
@@ -93,15 +96,18 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         try {
-                                            userLogin = new JSONObject(dataSnapshot.getValue().toString());
-                                            if(userLogin.getBoolean("isCouple")){
-                                                //커플은 커플페이지로
+                                            UserClass userClass = dataSnapshot.getValue(UserClass.class);
+                                            userLogin = userClass;
+                                            userLogin.uid = dataSnapshot.getKey();
+                                            if(userClass.isCouple){
+                                                //커플은 커플페이지로)
                                             }else{
-                                                if(userLogin.isNull("couple")){
+                                                if(userClass.couple.isEmpty()){
                                                     Intent intent = new Intent(LoginActivity.this, CoupleconnectActivity.class);
                                                     startActivity(intent);
                                                 }else{
-                                                    //커플신청이 있으면 커플수락페이지로
+                                                    Intent intent = new Intent(LoginActivity.this, CoupleapplyActivity.class);
+                                                    startActivity(intent);
                                                 }
                                             }
                                             hideProgressDialog();
@@ -156,28 +162,7 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.login_login_btn) {
-            databaseReference.child("user").orderByChild("email").equalTo(loginEmailEdit.getText().toString()).addListenerForSingleValueEvent(
-                    new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            try {
-                                //데이터를 어떻게 가공할지 생각해보면됨
-                                util.log("e", dataSnapshot.getValue().toString());
-                                JSONObject jsonObject = new JSONObject(dataSnapshot.getValue().toString().replace("=",":"));
-                                util.log("e", jsonObject.toString());
-                            } catch (Exception e) {
-                                util.log("e", e.getMessage());
-                            }
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            util.log("e", databaseError.toString());
-                        }
-                    }
-            );
-
-            return;
-//            signIn(loginEmailEdit.getText().toString(), loginPwEdit.getText().toString());
+            signIn(loginEmailEdit.getText().toString(), loginPwEdit.getText().toString());
         }
         if (i == R.id.login_signup_btn) {
             Intent intent = new Intent(this, SignUpActivity.class);

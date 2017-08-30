@@ -17,12 +17,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -48,30 +46,11 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.apply_activity);
+        setContentView(R.layout.connect_activity);
         ButterKnife.bind(this);
         applyCoupleInvite.setOnClickListener(this);
         applyCoupleApply.setOnClickListener(this);
         applyEmail.setText("image5956@naver.com");
-
-        databaseReference.child("user").child(util.getBase64decode(applyEmail.getText().toString())).addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        try {
-                            UserClass userClass = dataSnapshot.getValue(UserClass.class);
-                            util.log("e", dataSnapshot.getValue().toString());
-                        } catch (Exception e) {
-                            util.log("e", e.getMessage());
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        util.log("e", databaseError.toString());
-                    }
-                }
-        );
-
     }
 
     @Override
@@ -95,15 +74,6 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
                 applyEmail.requestFocus();
                 return;
             }
-            try {
-                if(userLogin.getString("email").equals(email)){
-                    //아쉽게도 본인과 연애는 구현되지 않았습니다.
-                    return;
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-                //에처처리
-            }
             coupleConnect();
         }
         if (i == applyCoupleInvite.getId()) {
@@ -124,47 +94,34 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
 
     private void coupleConnect(){
         showProgressDialog();
-        databaseReference.child("user").child(util.getBase64encode(email)).addListenerForSingleValueEvent(
+
+        databaseReference.child("user").orderByChild("email").equalTo(email).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         try {
-
-                            UserClass userClass = dataSnapshot.getValue(UserClass.class);
-                            String data = dataSnapshot.getValue().toString().replace("=",":");
-                            data = "{"+data.substring(1,data.length()-1).replace("{","[{").replace("}","}]")+"}";
-                            util.log("e",data);
-                            util.log("e",new JSONObject(data).toString());
-                            Iterator i = user_data.keys();
-                            boolean isCoupleApply = false;
-                            JSONObject keyObject = new JSONObject();
-                            String key = "";
-                            while (i.hasNext()) {
-                                key = i.next().toString();
-                                if(user_data.getJSONObject(key).getString("email").contains(email)){
-                                    keyObject = user_data.getJSONObject(key);
-                                    isCoupleApply = true;
-                                    break;
-                                }
+                            DataSnapshot tmp_data = dataSnapshot.getChildren().iterator().next();
+                            //데이터를 어떻게 가공할지 생각해보면됨
+                            UserClass userClass = tmp_data.getValue(UserClass.class);
+                            util.log("e",userLogin.email+"///"+userLogin.uid);
+                            if(userClass.email.equals(userLogin.email)){
+                                Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_this, Toast.LENGTH_SHORT).show();
+                                hideProgressDialog();
+                                return;
                             }
-                            if(isCoupleApply){
-                                if(keyObject.getBoolean("isCouple")){
-                                    Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_couple, Toast.LENGTH_SHORT).show();
-                                }else{
-                                    if(keyObject.isNull("couple")){
-                                        keyObject.put("couple" , util.getNowTime()+util.getDevicesUUID());
-                                        util.log("e", util.toMap(keyObject).toString());
-                                        Map<String, Object> childUpdates = new HashMap<>();
-                                        childUpdates.put("/user/"+key , util.toMap(keyObject));
-                                        databaseReference.updateChildren(childUpdates);
-                                    }else{
-                                        Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_apply, Toast.LENGTH_SHORT).show();
-                                    }
-                                }
+                            if(userClass.isCouple){
+                                Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_couple, Toast.LENGTH_SHORT).show();
                             }else{
-                                Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_email, Toast.LENGTH_SHORT).show();
+                                if(userClass.couple.isEmpty()){
+                                    userClass.couple = userLogin.uid;
+                                    Map<String, Object> childUpdates = new HashMap<>();
+                                    childUpdates.put("/user/"+tmp_data.getKey() , userClass.toMap());
+                                    databaseReference.updateChildren(childUpdates);
+                                    Toast.makeText(CoupleconnectActivity.this, R.string.toast_couple_connect, Toast.LENGTH_SHORT).show();
+                                }else{
+                                    Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_apply, Toast.LENGTH_SHORT).show();
+                                }
                             }
-
                         } catch (Exception e) {
                             util.log("e", e.getMessage());
                         }
@@ -172,7 +129,9 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
                     }
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
+                        Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_email, Toast.LENGTH_SHORT).show();
                         util.log("e", databaseError.toString());
+                        hideProgressDialog();
                     }
                 }
         );

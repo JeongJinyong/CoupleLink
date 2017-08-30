@@ -77,7 +77,7 @@ public class Util {
      * @return time
      */
     public String getNowTime(){
-        SimpleDateFormat sdfNow = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdfNow = new SimpleDateFormat("yyyyMMddhhmmss");
         return sdfNow.format(new Date(System.currentTimeMillis()));
     }
 
@@ -142,29 +142,5 @@ public class Util {
             list.add(value);
         }
         return list;
-    }
-
-    /**
-     * Base64 인코딩
-     */
-    public String getBase64encode(String content){
-        try {
-            return Base64.encodeToString(content.getBytes("UTF-8"), 0);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-    /**
-     * Base64 디코딩
-     */
-    public String getBase64decode(String content){
-        try {
-            return new String(Base64.decode(content, 0),"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return "";
-        }
     }
 }

@@ -31,6 +31,9 @@
         <activity
             android:name=".CoupleconnectActivity">
         </activity>
+        <activity
+            android:name=".CoupleapplyActivity">
+        </activity>
 
         <meta-data
             android:name="com.kakao.sdk.AppKey"

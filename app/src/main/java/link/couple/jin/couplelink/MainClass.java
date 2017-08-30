@@ -18,6 +18,8 @@ import org.json.JSONObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import link.couple.jin.couplelink.data.UserClass;
+
 /**
  * 엑티비티에서 공용으로 쓰는건 최대한 메인으로 빼도록 하자.
  */
@@ -26,7 +28,7 @@ public class MainClass extends Activity implements MainInterface {
 
     public ProgressDialog mProgressDialog;
     public Util util;
-    public static JSONObject userLogin;
+    public static UserClass userLogin;
 
     FirebaseAuth firebaseAuth;
     DatabaseReference databaseReference;
