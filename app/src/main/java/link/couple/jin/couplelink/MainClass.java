@@ -7,18 +7,22 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import org.json.JSONObject;
+import com.google.firebase.database.Query;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import link.couple.jin.couplelink.data.UserClass;
+import link.couple.jin.couplelink.utile.Log;
+import link.couple.jin.couplelink.utile.Util;
+
+import static link.couple.jin.couplelink.utile.Constant.QUERY_COUPLE;
+import static link.couple.jin.couplelink.utile.Constant.QUERY_EMAIL_ALL;
+import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
 
 /**
  * 엑티비티에서 공용으로 쓰는건 최대한 메인으로 빼도록 하자.
@@ -32,6 +36,11 @@ public class MainClass extends Activity implements MainInterface {
 
     FirebaseAuth firebaseAuth;
     DatabaseReference databaseReference;
+
+    public MainClass(){
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +53,7 @@ public class MainClass extends Activity implements MainInterface {
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+                Log.d(Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -53,6 +62,22 @@ public class MainClass extends Activity implements MainInterface {
         }
 
     }
+
+    public Query getEmailQuery(String str, int type){
+        switch (type){
+            case QUERY_UID:
+                Log.e("111");
+                return databaseReference.child("user").child(str);
+            case QUERY_EMAIL_ALL:
+                Log.e("2222");
+                return databaseReference.child("user").orderByChild("/email").equalTo(str);
+            case QUERY_COUPLE:
+                Log.e("3333");
+                return databaseReference.child("user").orderByChild("/couple").equalTo(str).getRef();
+        }
+        return null;
+    }
+
 
     public void showProgressDialog() {
         if (mProgressDialog == null) {
@@ -72,9 +97,6 @@ public class MainClass extends Activity implements MainInterface {
 
     @Override
     public void test() {
-
-    }
-    public MainClass(){
 
     }
 }

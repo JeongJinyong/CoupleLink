@@ -1,15 +1,12 @@
-package link.couple.jin.couplelink;
+package link.couple.jin.couplelink.utile;
 
 import android.content.Context;
 import android.telephony.TelephonyManager;
-import android.util.Base64;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,41 +23,10 @@ import java.util.UUID;
 
 public class Util {
 
-    static String log = "COUPLE";
     Context context;
 
-    Util(Context context){
+    public Util(Context context){
         this.context = context;
-    }
-
-    /**
-     * 로그를 뿌린다.
-     * @param logKinds 로그종류(e,w,i,d,v)
-     * @param message 로그메세지
-     */
-    public void log(String logKinds ,String message){
-        String fullClassName = Thread.currentThread().getStackTrace()[3].getClassName();
-        String className = fullClassName.substring(fullClassName.lastIndexOf(".") + 1);
-        String methodName = Thread.currentThread().getStackTrace()[3].getMethodName();
-        int lineNumber = Thread.currentThread().getStackTrace()[3].getLineNumber();
-        switch (logKinds){
-            case "e":
-                Log.e(log,"[" + className + "." + methodName + "():" + lineNumber + "] : "+message);
-                break;
-            case "w":
-                Log.w(log,"[" + className + "." + methodName + "():" + lineNumber + "] : "+message);
-                break;
-            case "i":
-                Log.i(log,"[" + className + "." + methodName + "():" + lineNumber + "] : "+message);
-                break;
-            case "d":
-                Log.d(log,"[" + className + "." + methodName + "():" + lineNumber + "] : "+message);
-                break;
-            case "v":
-                Log.w(log,"[" + className + "." + methodName + "():" + lineNumber + "] : "+message);
-                break;
-        }
-
     }
 
     /**

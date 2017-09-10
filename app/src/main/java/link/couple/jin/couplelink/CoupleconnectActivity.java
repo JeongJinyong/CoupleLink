@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
@@ -27,6 +26,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import link.couple.jin.couplelink.data.UserClass;
 import link.couple.jin.couplelink.dialog.CoupleInvite;
+import link.couple.jin.couplelink.utile.Log;
+
+import static link.couple.jin.couplelink.utile.Constant.QUERY_EMAIL_ALL;
 
 /**
  * 커플 신청 및 커플 초대
@@ -95,7 +97,7 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
     private void coupleConnect(){
         showProgressDialog();
 
-        databaseReference.child("user").orderByChild("email").equalTo(email).addListenerForSingleValueEvent(
+        getEmailQuery(email,QUERY_EMAIL_ALL).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -103,7 +105,7 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
                             DataSnapshot tmp_data = dataSnapshot.getChildren().iterator().next();
                             //데이터를 어떻게 가공할지 생각해보면됨
                             UserClass userClass = tmp_data.getValue(UserClass.class);
-                            util.log("e",userLogin.email+"///"+userLogin.uid);
+                            Log.e(userClass.email);
                             if(userClass.email.equals(userLogin.email)){
                                 Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_this, Toast.LENGTH_SHORT).show();
                                 hideProgressDialog();
@@ -123,14 +125,14 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
                                 }
                             }
                         } catch (Exception e) {
-                            util.log("e", e.getMessage());
+                            Log.e( e.getMessage());
                         }
                         hideProgressDialog();
                     }
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_email, Toast.LENGTH_SHORT).show();
-                        util.log("e", databaseError.toString());
+                        Log.e( databaseError.toString());
                         hideProgressDialog();
                     }
                 }

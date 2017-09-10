@@ -19,6 +19,9 @@ import com.google.firebase.auth.FirebaseUser;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import link.couple.jin.couplelink.data.UserClass;
+import link.couple.jin.couplelink.utile.Log;
+
+import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
 
 /**
  * 회원가입 페이지
@@ -156,7 +159,7 @@ public class SignUpActivity extends MainClass {
                 if (task.isSuccessful()) {
                     FirebaseUser user = task.getResult().getUser();
                     UserClass userModel = new UserClass(email,username,  "", false);
-                    databaseReference.child("user").child(user.getUid()).setValue(userModel);
+                    getEmailQuery(user.getUid(),QUERY_UID).getRef().setValue(userModel);
                     Toast.makeText(SignUpActivity.this, R.string.toast_signup_complete, Toast.LENGTH_SHORT).show();
                     finish();
                 }
@@ -164,7 +167,7 @@ public class SignUpActivity extends MainClass {
         }).addOnFailureListener(this, new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                util.log("e", e.getMessage());
+                Log.e( e.getMessage());
                 /**
                  * 여기 에러코드를 알아보자 정녕 에러메세지로만 오류를 뿌려줘야할지 고민좀 해보자
                  */

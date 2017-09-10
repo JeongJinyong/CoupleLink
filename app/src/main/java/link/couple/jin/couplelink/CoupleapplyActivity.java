@@ -1,7 +1,6 @@
 package link.couple.jin.couplelink;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -15,6 +14,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import link.couple.jin.couplelink.data.UserClass;
+import link.couple.jin.couplelink.utile.Log;
+
+import static link.couple.jin.couplelink.utile.Constant.QUERY_COUPLE;
+import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
 
 /**
  * Created by image on 2017-08-15.
@@ -44,19 +47,17 @@ public class CoupleapplyActivity extends MainClass {
 
     private void getCoupleInfo() {
         showProgressDialog();
-        databaseReference.child("user").child(userLogin.couple).addListenerForSingleValueEvent(
+        getEmailQuery(userLogin.couple,QUERY_UID).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         try {
-
                             UserClass userClass = dataSnapshot.getValue(UserClass.class);
-                            util.log("e",dataSnapshot.getKey());
                             applyNickname.setText(userClass.username);
                             applyEmail.setText(userClass.email);
                         } catch (Exception e) {
                             e.printStackTrace();
-                            util.log("e", e.getMessage());
+                            Log.e( e.getMessage());
                         }
                         hideProgressDialog();
                     }
@@ -64,7 +65,7 @@ public class CoupleapplyActivity extends MainClass {
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Toast.makeText(CoupleapplyActivity.this, R.string.error_connect_email, Toast.LENGTH_SHORT).show();
-                        util.log("e", databaseError.toString());
+                        Log.e(databaseError.toString());
                         hideProgressDialog();
                     }
                 }
@@ -75,8 +76,11 @@ public class CoupleapplyActivity extends MainClass {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_refuse:
+                getEmailQuery(userLogin.couple,QUERY_COUPLE).getRef().removeValue();
                 break;
             case R.id.btn_consent:
+                userLogin.isCouple = true;
+                getEmailQuery(userLogin.uid,QUERY_UID).getRef().setValue(userLogin);
                 break;
         }
     }

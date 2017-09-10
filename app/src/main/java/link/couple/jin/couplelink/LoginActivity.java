@@ -1,10 +1,8 @@
 package link.couple.jin.couplelink;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -21,11 +19,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONObject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import link.couple.jin.couplelink.data.UserClass;
+import link.couple.jin.couplelink.utile.Log;
+
+import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
 
 /**
  * 로그인엑티비티
@@ -68,10 +67,10 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    util.log("e", "onAuthStateChanged:signed_in:" + user.getUid());
+                    Log.e( "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
                     // User is signed out
-                    util.log("e", "onAuthStateChanged:signed_out");
+                    Log.e( "onAuthStateChanged:signed_out");
                 }
             }
         };
@@ -90,8 +89,8 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        util.log("e", "signInWithEmail:onComplete:" + task.isSuccessful());
-                        databaseReference.child("user").child(task.getResult().getUser().getUid()).addListenerForSingleValueEvent(
+                        Log.e( "signInWithEmail:onComplete:" + task.isSuccessful());
+                        getEmailQuery(task.getResult().getUser().getUid(),QUERY_UID).addListenerForSingleValueEvent(
                                 new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -112,13 +111,13 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
                                             }
                                             hideProgressDialog();
                                         } catch (Exception e) {
-                                            util.log("e", e.getMessage());
+                                            Log.e( e.getMessage());
                                             e.printStackTrace();
                                         }
                                     }
                                     @Override
                                     public void onCancelled(DatabaseError databaseError) {
-                                        util.log("e", databaseError.toString()+"//"+databaseError.getCode()+"//"+databaseError.getDetails()+"//"+databaseError.getMessage());
+                                        Log.e( databaseError.toString()+"//"+databaseError.getCode()+"//"+databaseError.getDetails()+"//"+databaseError.getMessage());
                                     }
                                 });
                     }
@@ -128,7 +127,7 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
                 /**
                  * 여기 에러코드를 알아보자 정녕 에러메세지로만 오류를 뿌려줘야할지 고민좀 해보자
                  */
-                util.log("e", e.getMessage());
+                Log.e( e.getMessage());
             }
         });
         // [END sign_in_with_email]
