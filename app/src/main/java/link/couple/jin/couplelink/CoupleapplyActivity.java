@@ -76,7 +76,21 @@ public class CoupleapplyActivity extends MainClass {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_refuse:
-                getEmailQuery(userLogin.couple,QUERY_COUPLE).getRef().removeValue();
+                getEmailQuery(userLogin.couple,QUERY_COUPLE).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                            UserClass post = postSnapshot.getValue(UserClass.class);
+                            post.couple = "";
+                            postSnapshot.getRef().updateChildren(post.toMap());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
                 break;
             case R.id.btn_consent:
                 userLogin.isCouple = true;

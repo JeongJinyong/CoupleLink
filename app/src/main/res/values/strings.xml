@@ -31,7 +31,8 @@
     <string name="error_connect_apply">해당 회원은 이미 커플신청을 받았습니다.\n확인하여 주시기 바랍니다.</string>
     <string name="error_connect_email">이메일이 존재하지 않습니다.\n확인하여 주시기 바랍니다.</string>
     <string name="error_connect_this">아쉽게도 본인과 연애는 구현되지 않았습니다.</string>
-
+    <string name="error_connect_overlap">이미 커플신청을 하셨습니다.\n바람은 안되요!!</string>
+    
     <string name="toast_signup_complete">회원가입 되었습니다.</string>
     <string name="toast_couple_connect">커플신청 되었습니다.</string>
 

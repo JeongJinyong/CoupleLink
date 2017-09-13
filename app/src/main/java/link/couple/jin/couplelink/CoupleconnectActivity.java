@@ -28,6 +28,7 @@ import link.couple.jin.couplelink.data.UserClass;
 import link.couple.jin.couplelink.dialog.CoupleInvite;
 import link.couple.jin.couplelink.utile.Log;
 
+import static link.couple.jin.couplelink.utile.Constant.QUERY_COUPLE;
 import static link.couple.jin.couplelink.utile.Constant.QUERY_EMAIL_ALL;
 
 /**
@@ -76,7 +77,7 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
                 applyEmail.requestFocus();
                 return;
             }
-            coupleConnect();
+            checkCouple();
         }
         if (i == applyCoupleInvite.getId()) {
             int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
@@ -91,6 +92,21 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
                 new CoupleInvite(this).show();
             }
         }
+    }
+
+    private  void checkCouple(){
+        getEmailQuery(userLogin.uid,QUERY_COUPLE).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getChildrenCount() < 1) coupleConnect();
+                else Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_overlap, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 

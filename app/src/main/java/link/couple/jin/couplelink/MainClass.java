@@ -66,14 +66,11 @@ public class MainClass extends Activity implements MainInterface {
     public Query getEmailQuery(String str, int type){
         switch (type){
             case QUERY_UID:
-                Log.e("111");
                 return databaseReference.child("user").child(str);
             case QUERY_EMAIL_ALL:
-                Log.e("2222");
                 return databaseReference.child("user").orderByChild("/email").equalTo(str);
             case QUERY_COUPLE:
-                Log.e("3333");
-                return databaseReference.child("user").orderByChild("/couple").equalTo(str).getRef();
+                return databaseReference.child("user").orderByChild("/couple").equalTo(str);
         }
         return null;
     }
