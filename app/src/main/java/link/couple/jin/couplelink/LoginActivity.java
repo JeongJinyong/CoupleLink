@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -89,8 +90,7 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.e( "signInWithEmail:onComplete:" + task.isSuccessful());
-                        getEmailQuery(task.getResult().getUser().getUid(),QUERY_UID).addListenerForSingleValueEvent(
+                        getUserQuery(task.getResult().getUser().getUid(),QUERY_UID).addListenerForSingleValueEvent(
                                 new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -100,6 +100,8 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
                                             userLogin.uid = dataSnapshot.getKey();
                                             if(userClass.isCouple){
                                                 //커플은 커플페이지로)
+                                            }else if(userClass.isCoupleConnect) {
+                                                Toast.makeText(LoginActivity.this, R.string.toast_couple_wait, Toast.LENGTH_SHORT).show();
                                             }else{
                                                 if(userClass.couple.isEmpty()){
                                                     Intent intent = new Intent(LoginActivity.this, CoupleconnectActivity.class);

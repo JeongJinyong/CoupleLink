@@ -63,7 +63,7 @@ public class MainClass extends Activity implements MainInterface {
 
     }
 
-    public Query getEmailQuery(String str, int type){
+    public Query getUserQuery(String str, int type){
         switch (type){
             case QUERY_UID:
                 return databaseReference.child("user").child(str);

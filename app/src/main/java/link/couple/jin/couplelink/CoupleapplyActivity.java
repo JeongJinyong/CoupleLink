@@ -17,7 +17,6 @@ import link.couple.jin.couplelink.data.UserClass;
 import link.couple.jin.couplelink.utile.Log;
 
 import static link.couple.jin.couplelink.utile.Constant.QUERY_COUPLE;
-import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
 
 /**
  * Created by image on 2017-08-15.
@@ -47,17 +46,16 @@ public class CoupleapplyActivity extends MainClass {
 
     private void getCoupleInfo() {
         showProgressDialog();
-        getEmailQuery(userLogin.couple,QUERY_UID).addListenerForSingleValueEvent(
+        getUserQuery(userLogin.couple,QUERY_COUPLE).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        try {
-                            UserClass userClass = dataSnapshot.getValue(UserClass.class);
-                            applyNickname.setText(userClass.username);
-                            applyEmail.setText(userClass.email);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            Log.e( e.getMessage());
+                        for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                            UserClass post = postSnapshot.getValue(UserClass.class);
+                            if(!userLogin.email.equals(post.email)){
+                                applyNickname.setText(post.username);
+                                applyEmail.setText(post.email);
+                            }
                         }
                         hideProgressDialog();
                     }
@@ -73,29 +71,30 @@ public class CoupleapplyActivity extends MainClass {
     }
 
     @OnClick({R.id.btn_refuse, R.id.btn_consent})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.btn_refuse:
-                getEmailQuery(userLogin.couple,QUERY_COUPLE).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                            UserClass post = postSnapshot.getValue(UserClass.class);
+    public void onViewClicked(final View view) {
+        getUserQuery(userLogin.couple,QUERY_COUPLE).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    UserClass post = postSnapshot.getValue(UserClass.class);
+                    switch (view.getId()) {
+                        case R.id.btn_refuse:
                             post.couple = "";
-                            postSnapshot.getRef().updateChildren(post.toMap());
-                        }
+                            post.isCoupleConnect = false;
+                            break;
+                        case R.id.btn_consent:
+                            post.isCouple = true;
+                            post.isCoupleConnect = false;
+                            break;
                     }
+                    postSnapshot.getRef().updateChildren(post.toMap());
+                }
+            }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
-                break;
-            case R.id.btn_consent:
-                userLogin.isCouple = true;
-                getEmailQuery(userLogin.uid,QUERY_UID).getRef().setValue(userLogin);
-                break;
-        }
+            }
+        });
     }
 }

@@ -28,8 +28,8 @@ import link.couple.jin.couplelink.data.UserClass;
 import link.couple.jin.couplelink.dialog.CoupleInvite;
 import link.couple.jin.couplelink.utile.Log;
 
-import static link.couple.jin.couplelink.utile.Constant.QUERY_COUPLE;
 import static link.couple.jin.couplelink.utile.Constant.QUERY_EMAIL_ALL;
+import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
 
 /**
  * 커플 신청 및 커플 초대
@@ -43,9 +43,12 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
     Button applyCoupleApply;
     @BindView(R.id.apply_couple_invite)
     Button applyCoupleInvite;
+    @BindView(R.id.apply_couplenm)
+    EditText applyCouplenm;
 
     JSONObject user_data;
-    String email = "";
+    String email = "",couple_name = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +57,7 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
         applyCoupleInvite.setOnClickListener(this);
         applyCoupleApply.setOnClickListener(this);
         applyEmail.setText("image5956@naver.com");
+        applyCouplenm.setText("진용 은이");
     }
 
     @Override
@@ -61,7 +65,7 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
         int i = v.getId();
         if (i == applyCoupleApply.getId()) {
             int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
-            if(permissionCheck== PackageManager.PERMISSION_DENIED){
+            if (permissionCheck == PackageManager.PERMISSION_DENIED) {
                 new TedPermission(this)
                         .setPermissionListener(permissionlistener)
                         .setRationaleMessage(R.string.permission_phone)
@@ -71,35 +75,42 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
                 return;
             }
             email = applyEmail.getText().toString();
-            // 이메일 입력 확인
+            couple_name = applyCouplenm.getText().toString();
             if (TextUtils.isEmpty(email)) {
                 applyEmail.setError(util.getStringResources(R.string.edit_email_notinput));
                 applyEmail.requestFocus();
+                return;
+            }
+            if (TextUtils.isEmpty(couple_name) || couple_name.length() > 10) {
+                applyCouplenm.setError(util.getStringResources(R.string.edit_couplenm_notinput));
+                applyCouplenm.requestFocus();
                 return;
             }
             checkCouple();
         }
         if (i == applyCoupleInvite.getId()) {
             int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
-            if(permissionCheck== PackageManager.PERMISSION_DENIED){
+            if (permissionCheck == PackageManager.PERMISSION_DENIED) {
                 new TedPermission(this)
                         .setPermissionListener(permissionlistener)
                         .setRationaleMessage(R.string.permission_sms)
                         .setDeniedMessage(R.string.permission_sms_setting)
                         .setPermissions(Manifest.permission.SEND_SMS)
                         .check();
-            }else{
+            } else {
                 new CoupleInvite(this).show();
             }
         }
     }
 
-    private  void checkCouple(){
-        getEmailQuery(userLogin.uid,QUERY_COUPLE).addListenerForSingleValueEvent(new ValueEventListener() {
+    private void checkCouple() {
+        getUserQuery(userLogin.uid, QUERY_UID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getChildrenCount() < 1) coupleConnect();
-                else Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_overlap, Toast.LENGTH_SHORT).show();
+                UserClass userClass = dataSnapshot.getValue(UserClass.class);
+                if (!userClass.isCoupleConnect) coupleConnect();
+                else
+                    Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_overlap, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -110,10 +121,10 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
     }
 
 
-    private void coupleConnect(){
+    private void coupleConnect() {
         showProgressDialog();
 
-        getEmailQuery(email,QUERY_EMAIL_ALL).addListenerForSingleValueEvent(
+        getUserQuery(email, QUERY_EMAIL_ALL).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -122,33 +133,40 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
                             //데이터를 어떻게 가공할지 생각해보면됨
                             UserClass userClass = tmp_data.getValue(UserClass.class);
                             Log.e(userClass.email);
-                            if(userClass.email.equals(userLogin.email)){
+                            if (userClass.email.equals(userLogin.email)) {
                                 Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_this, Toast.LENGTH_SHORT).show();
                                 hideProgressDialog();
                                 return;
                             }
-                            if(userClass.isCouple){
+                            if (userClass.isCouple) {
                                 Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_couple, Toast.LENGTH_SHORT).show();
-                            }else{
-                                if(userClass.couple.isEmpty()){
-                                    userClass.couple = userLogin.uid;
+                            } else {
+                                if (userClass.couple.isEmpty()) {
+                                    String couple_nm = couple_name + util.getNowTime() + util.getRandomAlphabet();
+                                    userClass.couple = couple_nm;
                                     Map<String, Object> childUpdates = new HashMap<>();
-                                    childUpdates.put("/user/"+tmp_data.getKey() , userClass.toMap());
+                                    childUpdates.put("/user/" + tmp_data.getKey(), userClass.toMap());
+                                    databaseReference.updateChildren(childUpdates);
+                                    childUpdates = new HashMap<>();
+                                    userLogin.isCoupleConnect = true;
+                                    userLogin.couple = couple_nm;
+                                    childUpdates.put("/user/" + userLogin.uid, userLogin.toMap());
                                     databaseReference.updateChildren(childUpdates);
                                     Toast.makeText(CoupleconnectActivity.this, R.string.toast_couple_connect, Toast.LENGTH_SHORT).show();
-                                }else{
+                                } else {
                                     Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_apply, Toast.LENGTH_SHORT).show();
                                 }
                             }
                         } catch (Exception e) {
-                            Log.e( e.getMessage());
+                            Log.e(e.getMessage());
                         }
                         hideProgressDialog();
                     }
+
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Toast.makeText(CoupleconnectActivity.this, R.string.error_connect_email, Toast.LENGTH_SHORT).show();
-                        Log.e( databaseError.toString());
+                        Log.e(databaseError.toString());
                         hideProgressDialog();
                     }
                 }
@@ -158,14 +176,14 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
     PermissionListener permissionlistener = new PermissionListener() {
         @Override
         public void onPermissionGranted() {
-            Toast.makeText(CoupleconnectActivity.this,"다시버튼클릭하시오",Toast.LENGTH_SHORT).show();
+            Toast.makeText(CoupleconnectActivity.this, "다시버튼클릭하시오", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-            switch (deniedPermissions.get(0)){
+            switch (deniedPermissions.get(0)) {
                 case Manifest.permission.READ_PHONE_STATE:
-                    Toast.makeText(CoupleconnectActivity.this,"승낙안하면 진행못함",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CoupleconnectActivity.this, "승낙안하면 진행못함", Toast.LENGTH_SHORT).show();
                     break;
                 case Manifest.permission.SEND_SMS:
                     new CoupleInvite(CoupleconnectActivity.this).show();
@@ -175,7 +193,6 @@ public class CoupleconnectActivity extends MainClass implements View.OnClickList
 
 
     };
-
 
 
 }

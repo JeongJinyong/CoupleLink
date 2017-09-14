@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="vertical">
 
         <EditText
             android:id="@+id/apply_email"
@@ -17,8 +18,18 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:hint="@string/view_email"
+            android:hint="@string/edit_email_notinput"
             android:inputType="textEmailAddress"
+            android:maxLines="1"
+            android:layout_marginBottom="20dp"/>
+        <EditText
+            android:id="@+id/apply_couplenm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:hint="@string/edit_couplenm_notinput"
+            android:inputType="textPersonName"
             android:maxLines="1" />
     </LinearLayout>
     <LinearLayout

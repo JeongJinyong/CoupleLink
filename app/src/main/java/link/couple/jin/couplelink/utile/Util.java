@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 
@@ -60,6 +61,29 @@ public class Util {
         UUID deviceUuid = new UUID(androidId.hashCode(), ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
         String deviceId = deviceUuid.toString();
         return deviceId;
+    }
+
+    /**
+     * 랜덤 알파벳 3자리를 만듬 대소문자 구분없이
+     * @return temp
+     */
+    public String getRandomAlphabet(){
+        StringBuffer temp = new StringBuffer();
+        Random rnd = new Random();
+        for (int i = 0; i < 3; i++) {
+            int rIndex = rnd.nextInt(2);
+            switch (rIndex) {
+                case 0:
+                    // a-z
+                    temp.append((char) ((int) (rnd.nextInt(26)) + 97));
+                    break;
+                case 1:
+                    // A-Z
+                    temp.append((char) ((int) (rnd.nextInt(26)) + 65));
+                    break;
+            }
+        }
+        return temp.toString();
     }
 
     /**

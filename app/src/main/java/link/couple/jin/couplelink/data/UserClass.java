@@ -15,24 +15,26 @@ public class UserClass {
     public String username;
     public String couple = "";
     public boolean isCouple = false;
+    public boolean isCoupleConnect = false;
     public String uid;
 
     public UserClass(){}
 
-    public UserClass(@NonNull String email, @NonNull String username, @NonNull String couple, @NonNull boolean isCouple){
+    public UserClass(@NonNull String email, @NonNull String username, @NonNull String couple, @NonNull boolean isCouple,@NonNull boolean isCoupleConnect){
         this.email = email;
         this.username = username;
         this.couple = couple;
         this.isCouple = isCouple;
+        this.isCoupleConnect = isCoupleConnect;
     }
 
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("uid",uid);
         result.put("email", email);
         result.put("username", username);
         result.put("couple", couple);
         result.put("isCouple", isCouple);
+        result.put("isCoupleConnect", isCoupleConnect);
         return result;
     }
 
