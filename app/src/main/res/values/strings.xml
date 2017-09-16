@@ -47,4 +47,7 @@
 
     <string name="kakao_app_key">3591656e665defc7ca7606a6c1dade3a</string>
 
+    <string name="menu_category">카테고리</string>
+    <string name="menu_setting">환경설정</string>
+    <string name="menu_logout">로그아웃</string>
 </resources>
