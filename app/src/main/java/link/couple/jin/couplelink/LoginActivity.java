@@ -19,6 +19,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -95,9 +99,15 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         try {
+                                            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
                                             UserClass userClass = dataSnapshot.getValue(UserClass.class);
                                             userLogin = userClass;
                                             userLogin.uid = dataSnapshot.getKey();
+                                            if(!userLogin.fcm.equals(refreshedToken)){
+                                                userLogin.fcm = refreshedToken;
+                                                dataSnapshot.getRef().updateChildren(userLogin.toMap());
+                                            }
+
                                             if(userClass.isCouple){
                                                 //커플은 커플페이지로)
                                             }else if(userClass.isCoupleConnect) {

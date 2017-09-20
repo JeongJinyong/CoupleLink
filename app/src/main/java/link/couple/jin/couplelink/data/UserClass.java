@@ -17,6 +17,7 @@ public class UserClass {
     public boolean isCouple = false;
     public boolean isCoupleConnect = false;
     public String uid;
+    public String fcm = "";
 
     public UserClass(){}
 
@@ -35,6 +36,7 @@ public class UserClass {
         result.put("couple", couple);
         result.put("isCouple", isCouple);
         result.put("isCoupleConnect", isCoupleConnect);
+        result.put("fcm", fcm);
         return result;
     }
 
