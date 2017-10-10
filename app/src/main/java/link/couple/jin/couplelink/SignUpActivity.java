@@ -27,7 +27,7 @@ import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
  * 회원가입 페이지
  */
 
-public class SignUpActivity extends MainClass {
+public class SignUpActivity extends BaseActivity {
 
 
     @BindView(R.id.signup_email)

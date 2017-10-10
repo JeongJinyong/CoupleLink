@@ -21,9 +21,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import link.couple.jin.couplelink.data.UserClass;
@@ -35,7 +32,7 @@ import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
  * 로그인엑티비티
  */
 
-public class LoginActivity extends MainClass implements View.OnClickListener {
+public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
     @BindView(R.id.login_email_edit) EditText loginEmailEdit;
     @BindView(R.id.login_pw_edit) EditText loginPwEdit;
@@ -103,11 +100,10 @@ public class LoginActivity extends MainClass implements View.OnClickListener {
                                             UserClass userClass = dataSnapshot.getValue(UserClass.class);
                                             userLogin = userClass;
                                             userLogin.uid = dataSnapshot.getKey();
-                                            if(!userLogin.fcm.equals(refreshedToken)){
+                                            if(!userLogin.fcm.equals(refreshedToken)) {
                                                 userLogin.fcm = refreshedToken;
                                                 dataSnapshot.getRef().updateChildren(userLogin.toMap());
                                             }
-
                                             if(userClass.isCouple){
                                                 //커플은 커플페이지로)
                                             }else if(userClass.isCoupleConnect) {

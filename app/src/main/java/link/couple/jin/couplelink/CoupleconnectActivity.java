@@ -35,7 +35,7 @@ import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
  * 커플 신청 및 커플 초대
  */
 
-public class CoupleconnectActivity extends MainClass implements View.OnClickListener {
+public class CoupleconnectActivity extends BaseActivity implements View.OnClickListener {
 
     @BindView(R.id.apply_email)
     EditText applyEmail;

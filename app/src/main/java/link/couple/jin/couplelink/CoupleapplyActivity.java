@@ -22,7 +22,7 @@ import static link.couple.jin.couplelink.utile.Constant.QUERY_COUPLE;
  * Created by image on 2017-08-15.
  */
 
-public class CoupleapplyActivity extends MainClass {
+public class CoupleapplyActivity extends BaseActivity {
 
 
     @BindView(R.id.maintop_title)
