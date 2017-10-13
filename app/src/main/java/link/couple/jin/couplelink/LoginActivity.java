@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
 import link.couple.jin.couplelink.data.UserClass;
 import link.couple.jin.couplelink.utile.Log;
 
-import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
+import static link.couple.jin.couplelink.utile.Constant.USER_UID;
 
 /**
  * 로그인엑티비티
@@ -91,7 +91,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        getUserQuery(task.getResult().getUser().getUid(),QUERY_UID).addListenerForSingleValueEvent(
+                        getUserQuery(task.getResult().getUser().getUid(), USER_UID).addListenerForSingleValueEvent(
                                 new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -105,7 +105,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                                 dataSnapshot.getRef().updateChildren(userLogin.toMap());
                                             }
                                             if(userClass.isCouple){
-                                                //커플은 커플페이지로)
+                                                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                                                startActivity(intent);
+                                                finish();
                                             }else if(userClass.isCoupleConnect) {
                                                 Toast.makeText(LoginActivity.this, R.string.toast_couple_wait, Toast.LENGTH_SHORT).show();
                                             }else{

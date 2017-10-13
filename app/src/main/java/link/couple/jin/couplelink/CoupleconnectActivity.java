@@ -28,8 +28,8 @@ import link.couple.jin.couplelink.data.UserClass;
 import link.couple.jin.couplelink.dialog.CoupleInvite;
 import link.couple.jin.couplelink.utile.Log;
 
-import static link.couple.jin.couplelink.utile.Constant.QUERY_EMAIL_ALL;
-import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
+import static link.couple.jin.couplelink.utile.Constant.USER_EMAIL_ALL;
+import static link.couple.jin.couplelink.utile.Constant.USER_UID;
 
 /**
  * 커플 신청 및 커플 초대
@@ -104,7 +104,7 @@ public class CoupleconnectActivity extends BaseActivity implements View.OnClickL
     }
 
     private void checkCouple() {
-        getUserQuery(userLogin.uid, QUERY_UID).addListenerForSingleValueEvent(new ValueEventListener() {
+        getUserQuery(userLogin.uid, USER_UID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 UserClass userClass = dataSnapshot.getValue(UserClass.class);
@@ -124,7 +124,7 @@ public class CoupleconnectActivity extends BaseActivity implements View.OnClickL
     private void coupleConnect() {
         showProgressDialog();
 
-        getUserQuery(email, QUERY_EMAIL_ALL).addListenerForSingleValueEvent(
+        getUserQuery(email, USER_EMAIL_ALL).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {

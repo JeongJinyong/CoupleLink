@@ -2,10 +2,19 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+    <data>
+
+        <variable
+            name="couple"
+            type="link.couple.jin.couplelink.data.CoupleClass" />
+    </data>
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

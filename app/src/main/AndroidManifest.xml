@@ -34,7 +34,8 @@
         <activity
             android:name=".CoupleapplyActivity">
         </activity>
-
+        <activity android:name=".HomeActivity">
+        </activity>
 
         <service
             android:name=".fcm.CpFirebaseMessagService">

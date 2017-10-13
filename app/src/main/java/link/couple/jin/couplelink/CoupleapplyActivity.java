@@ -1,5 +1,6 @@
 package link.couple.jin.couplelink;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,7 +17,7 @@ import butterknife.OnClick;
 import link.couple.jin.couplelink.data.UserClass;
 import link.couple.jin.couplelink.utile.Log;
 
-import static link.couple.jin.couplelink.utile.Constant.QUERY_COUPLE;
+import static link.couple.jin.couplelink.utile.Constant.USER_COUPLE;
 
 /**
  * Created by image on 2017-08-15.
@@ -46,7 +47,7 @@ public class CoupleapplyActivity extends BaseActivity {
 
     private void getCoupleInfo() {
         showProgressDialog();
-        getUserQuery(userLogin.couple,QUERY_COUPLE).addListenerForSingleValueEvent(
+        getUserQuery(userLogin.couple, USER_COUPLE).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -72,7 +73,7 @@ public class CoupleapplyActivity extends BaseActivity {
 
     @OnClick({R.id.btn_refuse, R.id.btn_consent})
     public void onViewClicked(final View view) {
-        getUserQuery(userLogin.couple,QUERY_COUPLE).addListenerForSingleValueEvent(new ValueEventListener() {
+        getUserQuery(userLogin.couple, USER_COUPLE).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
@@ -89,6 +90,9 @@ public class CoupleapplyActivity extends BaseActivity {
                     }
                     postSnapshot.getRef().updateChildren(post.toMap());
                 }
+                Intent intent = new Intent(CoupleapplyActivity.this,HomeActivity.class);
+                startActivity(intent);
+                finish();
             }
 
             @Override

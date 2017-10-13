@@ -20,9 +20,10 @@ import link.couple.jin.couplelink.data.UserClass;
 import link.couple.jin.couplelink.utile.Log;
 import link.couple.jin.couplelink.utile.Util;
 
-import static link.couple.jin.couplelink.utile.Constant.QUERY_COUPLE;
-import static link.couple.jin.couplelink.utile.Constant.QUERY_EMAIL_ALL;
-import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
+import static link.couple.jin.couplelink.utile.Constant.COUPLE_UID;
+import static link.couple.jin.couplelink.utile.Constant.USER_COUPLE;
+import static link.couple.jin.couplelink.utile.Constant.USER_EMAIL_ALL;
+import static link.couple.jin.couplelink.utile.Constant.USER_UID;
 
 /**
  * 엑티비티에서 공용으로 쓰는건 최대한 메인으로 빼도록 하자.
@@ -65,12 +66,14 @@ public class BaseActivity extends Activity implements MainInterface {
 
     public Query getUserQuery(String str, int type){
         switch (type){
-            case QUERY_UID:
+            case USER_UID:
                 return databaseReference.child("user").child(str);
-            case QUERY_EMAIL_ALL:
+            case USER_EMAIL_ALL:
                 return databaseReference.child("user").orderByChild("/email").equalTo(str);
-            case QUERY_COUPLE:
+            case USER_COUPLE:
                 return databaseReference.child("user").orderByChild("/couple").equalTo(str);
+            case COUPLE_UID:
+                return databaseReference.child("couple").child(str);
         }
         return null;
     }

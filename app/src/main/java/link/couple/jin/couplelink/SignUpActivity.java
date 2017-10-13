@@ -21,7 +21,7 @@ import butterknife.ButterKnife;
 import link.couple.jin.couplelink.data.UserClass;
 import link.couple.jin.couplelink.utile.Log;
 
-import static link.couple.jin.couplelink.utile.Constant.QUERY_UID;
+import static link.couple.jin.couplelink.utile.Constant.USER_UID;
 
 /**
  * 회원가입 페이지
@@ -159,7 +159,7 @@ public class SignUpActivity extends BaseActivity {
                 if (task.isSuccessful()) {
                     FirebaseUser user = task.getResult().getUser();
                     UserClass userModel = new UserClass(email,username,  "", false,false);
-                    getUserQuery(user.getUid(),QUERY_UID).getRef().setValue(userModel);
+                    getUserQuery(user.getUid(), USER_UID).getRef().setValue(userModel);
                     Toast.makeText(SignUpActivity.this, R.string.toast_signup_complete, Toast.LENGTH_SHORT).show();
                     finish();
                 }
