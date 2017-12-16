@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "25.0.1"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "link.couple.jin.couplelink"
         minSdkVersion 19
@@ -33,6 +33,7 @@ dependencies {
 
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.0.0'
+    compile 'com.android.support:cardview-v7:25.3.1'
 
     compile 'com.google.firebase:firebase-auth:10.2.6'
     compile 'com.google.firebase:firebase-database:10.2.6'
@@ -48,5 +49,9 @@ dependencies {
 
     compile group: 'com.kakao.sdk', name: 'kakaolink', version: '1.1.36'
     compile 'gun0912.ted:tedpermission:1.0.2'
+
+    compile 'com.github.bumptech.glide:glide:4.2.0'
+    compile 'jp.wasabeef:glide-transformations:3.0.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.2.0'
 }
 apply plugin: 'com.google.gms.google-services'

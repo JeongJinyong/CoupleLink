@@ -2,6 +2,7 @@
 
 buildscript {
     repositories {
+        mavenCentral()
         jcenter()
         maven { url 'https://maven.google.com' }
     }
@@ -16,6 +17,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        maven { url 'https://maven.google.com' }
         maven { url 'http://devrepo.kakao.com:8088/nexus/content/groups/public/' }
         maven { url 'https://github.com/leonardocardoso/mvn-repo/raw/master/maven-deploy' }
     }

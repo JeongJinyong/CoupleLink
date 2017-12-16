@@ -79,7 +79,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         // [END auth_state_listener]
     }
 
-    private void signIn(String email, String password) {
+    private void signIn(final String email, final String password) {
         if (!validateForm(email, password)) {
             return;
         }
@@ -105,6 +105,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                                 dataSnapshot.getRef().updateChildren(userLogin.toMap());
                                             }
                                             if(userClass.isCouple){
+                                                if(loginAutoCheck.isChecked()){
+                                                    util.setAutoLogin(true);
+                                                    util.setLoginInfo(email,password);
+                                                }else{
+                                                    util.setAutoLogin(false);
+                                                    util.setLoginInfo(email,"");
+                                                }
                                                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                                                 startActivity(intent);
                                                 finish();

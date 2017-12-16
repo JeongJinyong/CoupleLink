@@ -1,7 +1,13 @@
 package link.couple.jin.couplelink.utile;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.databinding.BindingAdapter;
 import android.telephony.TelephonyManager;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +23,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
+
+import static com.bumptech.glide.Glide.with;
+
 
 /**
  * 이곳저곳 쓰게될 메서드들은 모아두자
@@ -25,9 +35,52 @@ import java.util.UUID;
 public class Util {
 
     Context context;
+    SharedPreferences sharedPreferences;
 
     public Util(Context context){
         this.context = context;
+        sharedPreferences = context.getSharedPreferences("link",Context.MODE_PRIVATE);
+    }
+
+    /**
+     * 자동로그인 설정 저장
+     * @param isAuto
+     */
+    public void setAutoLogin(boolean isAuto){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("auto_login",isAuto);
+        editor.commit();
+    }
+
+    /**
+     * 로그인정보 저장 자동로그인이 아닐경우엔 비밀번호는 공백으로 처리 = ""
+     * @param login_id
+     * @param login_pw
+     */
+    public void setLoginInfo(String login_id,String login_pw){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("login_id",login_id);
+        editor.putString("login_pw",login_pw);
+        editor.commit();
+    }
+
+    /**
+     * 자동로그인 설정 가져옴
+     * @return
+     */
+    public boolean isAutoLogin(){
+        return sharedPreferences.getBoolean("auto_login",false);
+    }
+
+    /**
+     * 로그인 정보를 가져옴
+     * @return
+     */
+    public String[] getLoginInfo(){
+        String[] login_info = new String[1];
+        login_info[0] = sharedPreferences.getString("login_id","");
+        login_info[1] = sharedPreferences.getString("login_pw","");
+        return login_info;
     }
 
     /**
@@ -45,6 +98,15 @@ public class Util {
      */
     public String getNowTime(){
         SimpleDateFormat sdfNow = new SimpleDateFormat("yyyyMMddhhmmss");
+        return sdfNow.format(new Date(System.currentTimeMillis()));
+    }
+
+    /**
+     * yyyy-MM-dd 형식
+     * @return time
+     */
+    public String getYMDTime(){
+        SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy-MM-dd");
         return sdfNow.format(new Date(System.currentTimeMillis()));
     }
 
@@ -132,5 +194,33 @@ public class Util {
             list.add(value);
         }
         return list;
+    }
+
+    /**
+     * 글라이드 사용 간단하게 이미지만 불러옴
+     * @param imageView
+     * @param imageUrl
+     */
+    @BindingAdapter({"bind:imageUrl"})
+    public static void loadImage(final ImageView imageView, String imageUrl) {
+        if(!imageUrl.contains("https"))
+            imageUrl = "http://" + imageUrl.substring(imageUrl.indexOf("//")+2,imageUrl.length());
+        Glide.with(imageView.getContext())
+                .load(imageUrl)
+                .apply(RequestOptions.skipMemoryCacheOf(true).override(imageView.getMaxWidth(),imageView.getMaxHeight()))
+                .into(imageView);
+    }
+
+    /**
+     * 글라이드 사용 Circle Crop
+     * @param imageView
+     * @param imageUrl
+     */
+    @BindingAdapter({"bind:loadImageCircle"})
+    public static void loadImageCircle(final ImageView imageView, String imageUrl) {
+        with(imageView.getContext())
+                .load(imageUrl)
+                .apply(RequestOptions.bitmapTransform(new CropCircleTransformation()))
+                .into(imageView);
     }
 }

@@ -15,13 +15,21 @@ public class CoupleClass {
     public String link;
     public String date;
     public String category;
+    public String title;
 
     public CoupleClass(){}
 
-    public CoupleClass(@NonNull String link, @NonNull String date, @NonNull String category){
+    /**
+     * @param link
+     * @param date
+     * @param category
+     * @param title
+     */
+    public CoupleClass(@NonNull String link, @NonNull String date, @NonNull String category, @NonNull String title){
         this.link = link;
         this.date = date;
         this.category = category;
+        this.title = title;
     }
 
     public Map<String, Object> toMap() {
@@ -29,6 +37,7 @@ public class CoupleClass {
         result.put("link", link);
         result.put("date", date);
         result.put("category", category);
+        result.put("title", title);
         return result;
     }
 

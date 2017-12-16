@@ -3,20 +3,91 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:fitsSystemWindows="true">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_drawer_layout"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
 
-    <RelativeLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:context=".HomeActivity">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/home_recycler"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark" />
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    </RelativeLayout>
+        <Button
+            android:id="@+id/btn_write"
+            android:text="쓰기"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="20dp"/>
+
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_scrollFlags="scroll|enterAlways">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:background="@color/colorPrimary"
+                        android:layout_height="wrap_content">
+
+                        <FrameLayout
+                            android:id="@+id/fl_category"
+                            android:layout_width="50dp"
+                            android:layout_height="45dp">
+
+                            <ImageView
+                                android:layout_width="21dp"
+                                android:layout_height="21dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/category_icon" />
+
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="45dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_weight="1"
+                            android:padding="5dp"
+                            android:text="모두보기"
+                            android:textStyle="bold"
+                            android:textSize="21dp" />
+
+                        <FrameLayout
+                            android:id="@+id/fl_setting"
+                            android:layout_width="50dp"
+                            android:layout_height="45dp"
+                            android:layout_alignParentEnd="true">
+
+                            <ImageView
+                                android:layout_width="21dp"
+                                android:layout_height="21dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/setting_icon" />
+                        </FrameLayout>
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </android.support.design.widget.CollapsingToolbarLayout>
+        </android.support.design.widget.AppBarLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation_view"
@@ -24,12 +95,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/drawer_header"
-        app:menu="@menu/drawer" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/home_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        app:menu="@menu/drawer"
+        android:visibility="gone"/>
 
 </android.support.v4.widget.DrawerLayout>
