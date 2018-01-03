@@ -34,8 +34,15 @@
         <activity
             android:name=".CoupleapplyActivity">
         </activity>
-        <activity android:name=".HomeActivity">
+        <activity android:name=".home.HomeActivity">
         </activity>
+
+        <receiver android:name=".service.ClipboardMonitorStarter">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <service android:name=".service.ClipboardMonitor"></service>
 
         <service
             android:name=".fcm.CpFirebaseMessagService">

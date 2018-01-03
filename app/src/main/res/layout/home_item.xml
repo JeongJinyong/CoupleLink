@@ -40,7 +40,8 @@
                             android:layout_height="wrap_content"
                             android:text="@{couple.category}"
                             android:layout_weight="1"
-                            android:gravity="left"/>
+                            android:gravity="left"
+                            android:visibility="gone"/>
 
                         <TextView
                             android:id="@+id/link_date"

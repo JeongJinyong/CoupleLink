@@ -24,6 +24,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import link.couple.jin.couplelink.data.UserClass;
+import link.couple.jin.couplelink.home.HomeActivity;
 import link.couple.jin.couplelink.utile.Log;
 
 import static link.couple.jin.couplelink.utile.Constant.USER_UID;

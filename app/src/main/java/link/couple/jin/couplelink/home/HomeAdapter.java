@@ -1,4 +1,4 @@
-package link.couple.jin.couplelink;
+package link.couple.jin.couplelink.home;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +12,7 @@ import com.leocardz.link.preview.library.TextCrawler;
 
 import java.util.ArrayList;
 
+import link.couple.jin.couplelink.R;
 import link.couple.jin.couplelink.data.CoupleClass;
 import link.couple.jin.couplelink.databinding.HomeItemBinding;
 import link.couple.jin.couplelink.utile.Util;

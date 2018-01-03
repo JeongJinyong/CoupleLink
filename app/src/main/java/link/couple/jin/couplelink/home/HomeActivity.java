@@ -1,12 +1,15 @@
-package link.couple.jin.couplelink;
+package link.couple.jin.couplelink.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -17,6 +20,10 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import link.couple.jin.couplelink.BaseActivity;
+import link.couple.jin.couplelink.service.ClipboardMonitor;
+import link.couple.jin.couplelink.LoginActivity;
+import link.couple.jin.couplelink.R;
 import link.couple.jin.couplelink.data.CoupleClass;
 import link.couple.jin.couplelink.dialog.WriteDialog;
 
@@ -47,6 +54,31 @@ public class HomeActivity extends BaseActivity {
         homeAdapter = new HomeAdapter(HomeActivity.this, classArrayList);
         homeRecycler.setLayoutManager(new LinearLayoutManager(this));
         settingList();
+
+        startService(new Intent(this, ClipboardMonitor.class));
+
+        View headerView = navigationView.getHeaderView(0);
+        TextView nameText = headerView.findViewById(R.id.name_text);
+        nameText.setText(userLogin.username);
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                switch(item.getGroupId()){
+//                    case R.id.navigat_category:
+//                        break;
+                    case R.id.navigat_setting:
+                        break;
+                    case R.id.navigat_logout:
+                        firebaseAuth.signOut();
+                        Intent intent = new Intent(HomeActivity.this,LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                        break;
+                }
+                return false;
+            }
+        });
     }
 
     private void settingList(){
@@ -75,7 +107,7 @@ public class HomeActivity extends BaseActivity {
         return true;
     }
 
-    @OnClick({R.id.fl_category, R.id.fl_setting, R.id.btn_write})
+    @OnClick({R.id.fl_category, R.id.fl_search, R.id.btn_write})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.fl_category:
@@ -84,7 +116,7 @@ public class HomeActivity extends BaseActivity {
                 else
                     mainDrawerLayout.openDrawer(Gravity.LEFT);
                 break;
-            case R.id.fl_setting:
+            case R.id.fl_search:
                 break;
             case R.id.btn_write:
                 WriteDialog writeDialog = new WriteDialog(this);

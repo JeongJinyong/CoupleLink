@@ -16,7 +16,7 @@ import com.leocardz.link.preview.library.TextCrawler;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import link.couple.jin.couplelink.HomeActivity;
+import link.couple.jin.couplelink.home.HomeActivity;
 import link.couple.jin.couplelink.R;
 import link.couple.jin.couplelink.data.CoupleClass;
 import link.couple.jin.couplelink.utile.Log;

@@ -11,7 +11,7 @@
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".HomeActivity">
+        tools:context=".home.HomeActivity">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/home_recycler"
@@ -21,11 +21,11 @@
 
         <Button
             android:id="@+id/btn_write"
-            android:text="쓰기"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="bottom|right"
-            android:layout_margin="20dp"/>
+            android:layout_margin="20dp"
+            android:background="@drawable/write"/>
 
 
         <android.support.design.widget.AppBarLayout
@@ -70,7 +70,7 @@
                             android:textSize="21dp" />
 
                         <FrameLayout
-                            android:id="@+id/fl_setting"
+                            android:id="@+id/fl_search"
                             android:layout_width="50dp"
                             android:layout_height="45dp"
                             android:layout_alignParentEnd="true">
@@ -79,7 +79,7 @@
                                 android:layout_width="21dp"
                                 android:layout_height="21dp"
                                 android:layout_gravity="center"
-                                android:src="@drawable/setting_icon" />
+                                android:src="@drawable/search_icon" />
                         </FrameLayout>
                     </RelativeLayout>
 

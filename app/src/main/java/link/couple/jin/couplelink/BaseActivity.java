@@ -2,6 +2,7 @@ package link.couple.jin.couplelink;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ClipboardManager;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -35,8 +36,8 @@ public class BaseActivity extends Activity implements MainInterface {
     public Util util;
     public static UserClass userLogin;
 
-    FirebaseAuth firebaseAuth;
-    DatabaseReference databaseReference;
+    public FirebaseAuth firebaseAuth;
+    public DatabaseReference databaseReference;
 
     public BaseActivity(){
 
@@ -61,6 +62,14 @@ public class BaseActivity extends Activity implements MainInterface {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+
+        ClipboardManager clipBoard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+        clipBoard.addPrimaryClipChangedListener(new ClipboardManager.OnPrimaryClipChangedListener() {
+            @Override
+            public void onPrimaryClipChanged() {
+                Log.e("asdasd");
+            }
+        });
 
     }
 
