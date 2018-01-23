@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
-        android:text="http://movie.naver.com/movie/bi/mi/basic.nhn?code=155665" />
+        android:text="http://yun4794.blog.me/221154488861" />
 
     <Button
         android:id="@+id/btn_preview"

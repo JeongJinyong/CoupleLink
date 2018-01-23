@@ -1,6 +1,7 @@
 package link.couple.jin.couplelink.home;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -15,7 +16,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,6 +29,7 @@ import link.couple.jin.couplelink.LoginActivity;
 import link.couple.jin.couplelink.R;
 import link.couple.jin.couplelink.data.CoupleClass;
 import link.couple.jin.couplelink.dialog.WriteDialog;
+import link.couple.jin.couplelink.utile.Log;
 
 import static link.couple.jin.couplelink.utile.Constant.COUPLE_UID;
 
@@ -60,7 +64,6 @@ public class HomeActivity extends BaseActivity {
         View headerView = navigationView.getHeaderView(0);
         TextView nameText = headerView.findViewById(R.id.name_text);
         nameText.setText(userLogin.username);
-
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -88,7 +91,16 @@ public class HomeActivity extends BaseActivity {
                 list_cnt = dataSnapshot.getChildrenCount();
                 classArrayList.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    classArrayList.add(postSnapshot.getValue(CoupleClass.class));
+                    CoupleClass coupleClass = postSnapshot.getValue(CoupleClass.class);
+                    DownloadFilesTask downloadFilesTask = new DownloadFilesTask();
+                    try {
+                        coupleClass.imageList = downloadFilesTask.execute(coupleClass.link).get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                    classArrayList.add(coupleClass);
                 }
                 homeRecycler.setAdapter(homeAdapter);
             }
@@ -99,6 +111,22 @@ public class HomeActivity extends BaseActivity {
             }
         });
     }
+
+    private class DownloadFilesTask extends AsyncTask<String,Void,ArrayList<String>> {
+
+        @Override
+        protected ArrayList<String> doInBackground(String... params) {
+            try {
+                return util.getImageTag(params[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return new ArrayList<>();
+            }
+        }
+
+    }
+
+
 
     public boolean setCoupleLink(CoupleClass coupleClass){
         getUserQuery(userLogin.couple, COUPLE_UID).getRef().child(list_cnt+"").setValue(coupleClass);
