@@ -41,7 +41,7 @@ public class ClipboardMonitor extends Service {
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,intent
               , 0);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.myclips_icon)
+                .setSmallIcon(R.drawable.search_icon)
                 .setContentTitle("링크추출")
                 .setContentText(str)
                 .setAutoCancel(true)

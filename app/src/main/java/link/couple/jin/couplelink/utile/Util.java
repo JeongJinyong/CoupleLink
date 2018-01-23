@@ -12,7 +12,12 @@ import com.bumptech.glide.request.RequestOptions;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -194,6 +199,31 @@ public class Util {
             list.add(value);
         }
         return list;
+    }
+
+    public ArrayList<String> getImageTag(final String url) throws IOException{
+        Document rawData = Jsoup.connect(url)
+                .timeout(5000)
+                .post();
+
+        Elements imgs = rawData.select("img");
+        if(imgs.size() == 0){
+            String reUrl = rawData.head().data().toString();
+            reUrl = reUrl.substring(reUrl.lastIndexOf("top.location.replace(\"")+"top.location.replace(\"".length(),reUrl.indexOf("\")"));
+            return getImageTag(reUrl);
+        }
+        ArrayList<String> imageUrls = new ArrayList<>();
+
+        for(Element img : imgs) {
+            for (int i = 0; i <img.attributes().asList().size(); i++){
+                if (!img.className().equals("")) continue;
+                String key = img.attributes().asList().get(i).getKey();
+                if (key.contains("src"))
+                    imageUrls.add(img.attributes().asList().get(i).getValue());
+                if(imageUrls.size() == 4) return imageUrls;
+            }
+        }
+        return imageUrls;
     }
 
     /**

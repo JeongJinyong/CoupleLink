@@ -2,6 +2,7 @@ package link.couple.jin.couplelink.data;
 
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ public class CoupleClass {
     public String date;
     public String category;
     public String title;
+    public ArrayList<String> imageList = new ArrayList<>();
 
     public CoupleClass(){}
 
