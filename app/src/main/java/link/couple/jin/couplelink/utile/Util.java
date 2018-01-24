@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -202,15 +203,19 @@ public class Util {
     }
 
     public ArrayList<String> getImageTag(final String url) throws IOException{
+        Log.e(url);
         Document rawData = Jsoup.connect(url)
                 .timeout(5000)
-                .post();
-
+                .get();
         Elements imgs = rawData.select("img");
         if(imgs.size() == 0){
-            String reUrl = rawData.head().data().toString();
-            reUrl = reUrl.substring(reUrl.lastIndexOf("top.location.replace(\"")+"top.location.replace(\"".length(),reUrl.indexOf("\")"));
-            return getImageTag(reUrl);
+            W3CDom w3CDom = new W3CDom();
+
+            org.w3c.dom.Document w3cDoc= w3CDom.fromJsoup(rawData);
+            return new ArrayList<>();
+//            String reUrl = rawData.head().data().toString();
+//            reUrl = reUrl.substring(reUrl.lastIndexOf("top.location.replace(\"")+"top.location.replace(\"".length(),reUrl.indexOf("\")"));
+//            return getImageTag(reUrl);
         }
         ArrayList<String> imageUrls = new ArrayList<>();
 

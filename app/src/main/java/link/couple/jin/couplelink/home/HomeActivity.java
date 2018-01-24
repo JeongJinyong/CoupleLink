@@ -15,6 +15,9 @@ import android.widget.TextView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.leocardz.link.preview.library.LinkPreviewCallback;
+import com.leocardz.link.preview.library.SourceContent;
+import com.leocardz.link.preview.library.TextCrawler;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,12 +27,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import link.couple.jin.couplelink.BaseActivity;
-import link.couple.jin.couplelink.service.ClipboardMonitor;
 import link.couple.jin.couplelink.LoginActivity;
 import link.couple.jin.couplelink.R;
 import link.couple.jin.couplelink.data.CoupleClass;
 import link.couple.jin.couplelink.dialog.WriteDialog;
-import link.couple.jin.couplelink.utile.Log;
+import link.couple.jin.couplelink.service.ClipboardMonitor;
 
 import static link.couple.jin.couplelink.utile.Constant.COUPLE_UID;
 
@@ -117,7 +119,23 @@ public class HomeActivity extends BaseActivity {
         @Override
         protected ArrayList<String> doInBackground(String... params) {
             try {
-                return util.getImageTag(params[0]);
+                final ArrayList<String> arrayList = util.getImageTag(params[0]);
+                TextCrawler textCrawler = new TextCrawler();
+                textCrawler.makePreview(new LinkPreviewCallback() {
+                    @Override
+                    public void onPre() {
+                    }
+
+                    @Override
+                    public void onPos(SourceContent sourceContent, boolean isNull) {
+                        if(!isNull || !sourceContent.getFinalUrl().equals("")){
+                            if(!sourceContent.getImages().isEmpty()) {
+                                arrayList.add(0,sourceContent.getImages().get(0));
+                            }
+                        }
+                    }
+                }, params[0]);
+                return arrayList;
             } catch (IOException e) {
                 e.printStackTrace();
                 return new ArrayList<>();

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/link_image"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:maxHeight="300dp"
+        android:scaleType="fitCenter"
+        app:srcCompat="@mipmap/ic_launcher"
+        android:contentDescription="@string/app_name"/>
+
+    <FrameLayout
+        android:id="@+id/left_btn"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/link_image"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/back" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/right_btn"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/link_image"
+        android:layout_alignEnd="@+id/link_image"
+        android:layout_alignParentTop="true">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/back" />
+    </FrameLayout>
+
+
+</RelativeLayout>
