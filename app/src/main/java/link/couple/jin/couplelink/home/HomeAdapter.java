@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import link.couple.jin.couplelink.R;
 import link.couple.jin.couplelink.data.CoupleClass;
 import link.couple.jin.couplelink.databinding.HomeItemBinding;
+import link.couple.jin.couplelink.utile.Log;
 
 /**
  * Created by jeongjin-yong on 2017. 10. 13..
@@ -41,7 +42,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder>{
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final CoupleClass coupleClass = coupleClassArrayList.get(position);
         holder.homeItemBinding.setCouple(coupleClass);
-        holder.homeItemBinding.linkImage.setAdapter(new HomeImgAdapter(context,coupleClass.imageList));
+        HomeImgAdapter homeImgAdapter = new HomeImgAdapter(context, coupleClass.imageList);
+        holder.homeItemBinding.linkImage.setAdapter(homeImgAdapter);
     }
 
     @Override

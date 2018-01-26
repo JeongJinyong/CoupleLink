@@ -60,7 +60,7 @@
                 </LinearLayout>
                 <android.support.v4.view.ViewPager
                     android:id="@+id/link_image"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/link_info_view"
                     android:layout_centerHorizontal="true" />

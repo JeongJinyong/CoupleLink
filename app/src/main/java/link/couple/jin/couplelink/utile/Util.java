@@ -19,6 +19,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -202,33 +203,45 @@ public class Util {
         return list;
     }
 
-    public ArrayList<String> getImageTag(final String url) throws IOException{
-        Log.e(url);
+    public HashMap<String,Object> getImageTag(final String url) throws IOException{
+        HashMap<String,Object> hashMap = new HashMap<>();
         Document rawData = Jsoup.connect(url)
                 .timeout(5000)
                 .get();
         Elements imgs = rawData.select("img");
         if(imgs.size() == 0){
-            W3CDom w3CDom = new W3CDom();
-
-            org.w3c.dom.Document w3cDoc= w3CDom.fromJsoup(rawData);
-            return new ArrayList<>();
+            Elements elements = rawData.select("frame");
+            for(Element img : elements) {
+                for (int i = 0; i <img.attributes().asList().size(); i++){
+                    String key = img.attributes().asList().get(i).getKey();
+                    if (key.contains("src")) {
+                        String s = img.attributes().asList().get(i).getValue();
+                        if(!s.contains("http")){
+                            URL u = new URL(url);
+                            s = u.getProtocol()+"://"+u.getHost()+s;
+                        }
+                        return getImageTag(s);
+                    }
+                }
+            }
 //            String reUrl = rawData.head().data().toString();
 //            reUrl = reUrl.substring(reUrl.lastIndexOf("top.location.replace(\"")+"top.location.replace(\"".length(),reUrl.indexOf("\")"));
 //            return getImageTag(reUrl);
         }
+        hashMap.put("url",url);
         ArrayList<String> imageUrls = new ArrayList<>();
 
-        for(Element img : imgs) {
+        element : for(Element img : imgs) {
             for (int i = 0; i <img.attributes().asList().size(); i++){
                 if (!img.className().equals("")) continue;
                 String key = img.attributes().asList().get(i).getKey();
                 if (key.contains("src"))
                     imageUrls.add(img.attributes().asList().get(i).getValue());
-                if(imageUrls.size() == 4) return imageUrls;
+                if(imageUrls.size() == 4) break element;
             }
         }
-        return imageUrls;
+        hashMap.put("array",imageUrls);
+        return hashMap;
     }
 
     /**
@@ -242,7 +255,7 @@ public class Util {
             imageUrl = "http://" + imageUrl.substring(imageUrl.indexOf("//")+2,imageUrl.length());
         Glide.with(imageView.getContext())
                 .load(imageUrl)
-                .apply(RequestOptions.skipMemoryCacheOf(true).override(imageView.getMaxWidth(),imageView.getMaxHeight()))
+//                .apply(RequestOptions.skipMemoryCacheOf(true).override(imageView.getMaxWidth(),imageView.getMaxHeight()))
                 .into(imageView);
     }
 

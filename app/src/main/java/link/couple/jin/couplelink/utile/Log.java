@@ -2,7 +2,6 @@ package link.couple.jin.couplelink.utile;
 
 /**
  * 로그를 뿌린다.
- * @param message 로그메세지
  */
 
 public class Log {

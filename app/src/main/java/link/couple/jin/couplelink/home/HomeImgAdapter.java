@@ -14,6 +14,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import link.couple.jin.couplelink.R;
+import link.couple.jin.couplelink.utile.Log;
 import link.couple.jin.couplelink.utile.Util;
 
 /**
@@ -29,7 +30,7 @@ public class HomeImgAdapter extends PagerAdapter {
     public HomeImgAdapter(Context context, ArrayList<String> imageList) {
         this.context = context;
         this.imageList = imageList;
-        mInflater = LayoutInflater.from(context);
+        mInflater = ((HomeActivity)context).getLayoutInflater();
     }
 
     @Override
@@ -39,22 +40,16 @@ public class HomeImgAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        View v = null;
-
-        ViewHolder holder;
-
-        if (v != null) {
-            holder = (ViewHolder) v.getTag();
-        } else {
-            v =  mInflater.inflate(R.layout.link_img_item, null, false);
-            holder = new ViewHolder(v);
-            v.setTag(holder);
-        }
-
+        ViewGroup layout = (ViewGroup) mInflater.inflate(R.layout.link_img_item, container, false);
+        ViewHolder holder = new ViewHolder(layout);
         Util.loadImage(holder.linkImage,imageList.get(position));
+        container.addView(layout);
+        return layout;
+    }
 
-        container.addView(v);
-        return v;
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
     }
 
     @Override

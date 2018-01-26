@@ -20,7 +20,10 @@ import com.leocardz.link.preview.library.SourceContent;
 import com.leocardz.link.preview.library.TextCrawler;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
@@ -32,6 +35,7 @@ import link.couple.jin.couplelink.R;
 import link.couple.jin.couplelink.data.CoupleClass;
 import link.couple.jin.couplelink.dialog.WriteDialog;
 import link.couple.jin.couplelink.service.ClipboardMonitor;
+import link.couple.jin.couplelink.utile.Log;
 
 import static link.couple.jin.couplelink.utile.Constant.COUPLE_UID;
 
@@ -59,6 +63,7 @@ public class HomeActivity extends BaseActivity {
         ButterKnife.bind(this);
         homeAdapter = new HomeAdapter(HomeActivity.this, classArrayList);
         homeRecycler.setLayoutManager(new LinearLayoutManager(this));
+        homeRecycler.setAdapter(homeAdapter);
         settingList();
 
         startService(new Intent(this, ClipboardMonitor.class));
@@ -86,6 +91,9 @@ public class HomeActivity extends BaseActivity {
         });
     }
 
+    /**
+     * 리스트 셋팅
+     */
     private void settingList(){
         getUserQuery(userLogin.couple, COUPLE_UID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -93,20 +101,11 @@ public class HomeActivity extends BaseActivity {
                 list_cnt = dataSnapshot.getChildrenCount();
                 classArrayList.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    CoupleClass coupleClass = postSnapshot.getValue(CoupleClass.class);
-                    DownloadFilesTask downloadFilesTask = new DownloadFilesTask();
-                    try {
-                        coupleClass.imageList = downloadFilesTask.execute(coupleClass.link).get();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                    classArrayList.add(coupleClass);
+                    final CoupleClass coupleClass = postSnapshot.getValue(CoupleClass.class);
+                    DownloadFilesTask downloadFilesTask = new DownloadFilesTask(HomeActivity.this);
+                    downloadFilesTask.execute(coupleClass);
                 }
-                homeRecycler.setAdapter(homeAdapter);
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 databaseError.toException().printStackTrace();
@@ -114,34 +113,58 @@ public class HomeActivity extends BaseActivity {
         });
     }
 
-    private class DownloadFilesTask extends AsyncTask<String,Void,ArrayList<String>> {
+    /**
+     * 데이터 수집 후 어댑터 체인
+     * @param coupleClass
+     */
+    public void notifyDataSetChanged(CoupleClass coupleClass){
+        classArrayList.add(coupleClass);
+        if(classArrayList.size() == list_cnt) {
+            homeAdapter.notifyDataSetChanged();
+        }
+    }
 
-        @Override
-        protected ArrayList<String> doInBackground(String... params) {
-            try {
-                final ArrayList<String> arrayList = util.getImageTag(params[0]);
-                TextCrawler textCrawler = new TextCrawler();
-                textCrawler.makePreview(new LinkPreviewCallback() {
-                    @Override
-                    public void onPre() {
-                    }
+    private class DownloadFilesTask extends AsyncTask<CoupleClass,Void,HashMap<String,Object>> {
 
-                    @Override
-                    public void onPos(SourceContent sourceContent, boolean isNull) {
-                        if(!isNull || !sourceContent.getFinalUrl().equals("")){
-                            if(!sourceContent.getImages().isEmpty()) {
-                                arrayList.add(0,sourceContent.getImages().get(0));
-                            }
-                        }
-                    }
-                }, params[0]);
-                return arrayList;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return new ArrayList<>();
-            }
+        HomeActivity homeActivity;
+
+        public DownloadFilesTask(HomeActivity homeActivity){
+            this.homeActivity = homeActivity;
         }
 
+        @Override
+        protected HashMap<String,Object> doInBackground(CoupleClass... params) {
+            try {
+                HashMap<String,Object> hashMap = util.getImageTag(params[0].link);
+                hashMap.put("couple",params[0]);
+                return  hashMap;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return new HashMap<>();
+        }
+
+        @Override
+        protected void onPostExecute(final HashMap<String, Object> stringObjectHashMap) {
+            final ArrayList<String> arrayList = (ArrayList<String>) stringObjectHashMap.get("array");
+            TextCrawler textCrawler = new TextCrawler();
+            textCrawler.makePreview(new LinkPreviewCallback() {
+                @Override
+                public void onPre() {}
+
+                @Override
+                public void onPos(SourceContent sourceContent, boolean isNull) {
+                    if(!isNull || !sourceContent.getFinalUrl().equals("")){
+                        if(!sourceContent.getImages().isEmpty()) {
+                            arrayList.add(0,sourceContent.getImages().get(0));
+                        }
+                    }
+                    CoupleClass coupleClass = (CoupleClass) stringObjectHashMap.get("couple");
+                    coupleClass.imageList = arrayList;
+                    homeActivity.notifyDataSetChanged(coupleClass);
+                }
+            }, (String) stringObjectHashMap.get("url"));
+        }
     }
 
 
