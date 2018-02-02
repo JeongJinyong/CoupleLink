@@ -42,7 +42,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder>{
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final CoupleClass coupleClass = coupleClassArrayList.get(position);
         holder.homeItemBinding.setCouple(coupleClass);
-        HomeImgAdapter homeImgAdapter = new HomeImgAdapter(context, coupleClass.imageList);
+        HomeImgAdapter homeImgAdapter = new HomeImgAdapter(context, coupleClass.imageList,holder.homeItemBinding.linkImage);
         holder.homeItemBinding.linkImage.setAdapter(homeImgAdapter);
     }
 

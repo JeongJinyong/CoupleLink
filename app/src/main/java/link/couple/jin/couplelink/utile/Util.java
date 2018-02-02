@@ -233,10 +233,14 @@ public class Util {
 
         element : for(Element img : imgs) {
             for (int i = 0; i <img.attributes().asList().size(); i++){
-                if (!img.className().equals("")) continue;
                 String key = img.attributes().asList().get(i).getKey();
-                if (key.contains("src"))
-                    imageUrls.add(img.attributes().asList().get(i).getValue());
+                try {
+                    if (key.contains("src") && (Integer.parseInt(img.attr("width")) > 100 || img.attr("width").equals(""))) {
+                        if (imageUrls.contains(img.attributes().asList().get(i).getValue()))
+                            continue;
+                        imageUrls.add(img.attributes().asList().get(i).getValue());
+                    }
+                }catch (Exception e){}
                 if(imageUrls.size() == 4) break element;
             }
         }
