@@ -11,6 +11,7 @@ import android.support.v4.app.NotificationCompat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import link.couple.jin.couplelink.LoginActivity;
 import link.couple.jin.couplelink.R;
 import link.couple.jin.couplelink.home.HomeActivity;
 import link.couple.jin.couplelink.utile.Log;
@@ -36,8 +37,10 @@ public class ClipboardMonitor extends Service {
     }
 
     private void showNotification(String str) {
-        Intent intent = new Intent(this, HomeActivity.class);
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("url",str);
+        Log.e(intent.getStringExtra("url"));
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,intent
               , 0);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)

@@ -1,5 +1,7 @@
 package link.couple.jin.couplelink.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ import java.util.Map;
  * TODO 뭐가 드렁가야할지 생각해봐야댐
  */
 
-public class CoupleClass {
+public class CoupleClass implements Parcelable {
 
     public String link;
     public String date;
@@ -20,6 +22,8 @@ public class CoupleClass {
     public ArrayList<String> imageList = new ArrayList<>();
 
     public CoupleClass(){}
+
+    public CoupleClass(Parcel in){readFromParcel(in);}
 
     /**
      * @param link
@@ -42,6 +46,38 @@ public class CoupleClass {
         result.put("title", title);
         return result;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringList(imageList);
+        dest.writeString(link);
+        dest.writeString(date);
+        dest.writeString(category);
+        dest.writeString(title);
+    }
+
+    private void readFromParcel(Parcel in){
+        in.readStringList(imageList);
+        link = in.readString();
+        date = in.readString();
+        category = in.readString();
+        title = in.readString();
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public CoupleClass createFromParcel(Parcel in) {
+            return new CoupleClass(in);
+        }
+
+        public CoupleClass[] newArray(int size) {
+            return new CoupleClass[size];
+        }
+    };
 
     /**
      *  databaseReference.getRef().child("couple").child("진용♡은이20170914104341vnv").addListenerForSingleValueEvent(

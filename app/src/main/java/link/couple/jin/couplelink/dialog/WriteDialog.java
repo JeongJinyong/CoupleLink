@@ -37,6 +37,7 @@ public class WriteDialog extends Dialog {
     ImageView linkImage;
     @BindView(R.id.edit_title)
     EditText editTitle;
+    String url = "";
 
     public WriteDialog(@NonNull Context context) {
         super(context);
@@ -45,11 +46,19 @@ public class WriteDialog extends Dialog {
         util = new Util(context);
     }
 
+    public WriteDialog(@NonNull Context context,String url) {
+        this(context);
+        this.url = url;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_write);
         ButterKnife.bind(this);
+        if (!url.equals("")){
+            editAddress.setText(url);
+        }
     }
 
     @OnClick({R.id.btn_preview, R.id.btn_cancel, R.id.btn_confirm})

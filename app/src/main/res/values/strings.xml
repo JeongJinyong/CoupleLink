@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">CoupleLink</string>
 
+    <string name="start_ad_unit_id">ca-app-pub-1535174860728352/1775977068</string>
+    <string name="ads_app_id">ca-app-pub-1535174860728352~9208562767</string>
 
     <string name="view_email">이메일</string>
     <string name="view_pw">비밀번호</string>
@@ -46,6 +48,7 @@
     <string name="permission_phone_setting">권한이 없으면 커플신청이 불가능 합니다.\n하지만 [설정] > [권한] 에서 권한을 허용할 수 있어요.</string>
 
     <string name="kakao_app_key">3591656e665defc7ca7606a6c1dade3a</string>
+    <string name="kakao_client_secret">c0YCMP4o6ijXLXFCZesNG0D5lgWIfXVo</string>
 
     <string name="menu_category">카테고리</string>
     <string name="menu_setting">환경설정</string>

@@ -3,11 +3,18 @@ package link.couple.jin.couplelink.utile;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.databinding.BindingAdapter;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+import com.leocardz.link.preview.library.Regex;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,8 +36,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
+import link.couple.jin.couplelink.R;
 
 import static com.bumptech.glide.Glide.with;
 
@@ -208,6 +218,9 @@ public class Util {
         Document rawData = Jsoup.connect(url)
                 .timeout(5000)
                 .get();
+        List matches = Regex.pregMatchAll(rawData.head().toString(), "<meta(.*?)>", 1);
+        Iterator var4 = matches.iterator();
+
         Elements imgs = rawData.select("img");
         if(imgs.size() == 0){
             Elements elements = rawData.select("frame");
@@ -230,15 +243,21 @@ public class Util {
         }
         hashMap.put("url",url);
         ArrayList<String> imageUrls = new ArrayList<>();
-
+        while(var4.hasNext()) {
+            String match = (String) var4.next();
+            if(match.contains("property=\"og:image\"") || match.contains("property=\'og:image\'") || match.contains("name=\"image\"") || match.contains("name=\'image\'")) {
+                imageUrls.add(Regex.pregMatch(match, "content=\"(.*?)\"", 1));
+            }
+        }
         element : for(Element img : imgs) {
             for (int i = 0; i <img.attributes().asList().size(); i++){
                 String key = img.attributes().asList().get(i).getKey();
                 try {
                     if (key.contains("src") && (Integer.parseInt(img.attr("width")) > 100 || img.attr("width").equals(""))) {
-                        if (imageUrls.contains(img.attributes().asList().get(i).getValue()))
+                        String val = img.attributes().asList().get(i).getValue();
+                        if (imageUrls.contains(val))
                             continue;
-                        imageUrls.add(img.attributes().asList().get(i).getValue());
+                        imageUrls.add(val);
                     }
                 }catch (Exception e){}
                 if(imageUrls.size() == 4) break element;
@@ -247,7 +266,6 @@ public class Util {
         hashMap.put("array",imageUrls);
         return hashMap;
     }
-
     /**
      * 글라이드 사용 간단하게 이미지만 불러옴
      * @param imageView
@@ -259,7 +277,7 @@ public class Util {
             imageUrl = "http://" + imageUrl.substring(imageUrl.indexOf("//")+2,imageUrl.length());
         Glide.with(imageView.getContext())
                 .load(imageUrl)
-//                .apply(RequestOptions.skipMemoryCacheOf(true).override(imageView.getMaxWidth(),imageView.getMaxHeight()))
+                .apply(new RequestOptions().error(R.drawable.kakaotalk_icon)) //TODO 에러아이콘 바꿔야함
                 .into(imageView);
     }
 

@@ -15,14 +15,20 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.kakao.auth.IApplicationConfig;
+import com.kakao.auth.ISessionCallback;
+import com.kakao.auth.KakaoAdapter;
+import com.kakao.auth.KakaoSDK;
+import com.kakao.auth.Session;
+import com.kakao.util.exception.KakaoException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import link.couple.jin.couplelink.data.CoupleClass;
 import link.couple.jin.couplelink.data.UserClass;
 import link.couple.jin.couplelink.home.HomeActivity;
 import link.couple.jin.couplelink.utile.Log;
@@ -42,11 +48,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     @BindView(R.id.login_login_btn) Button loginLoginBtn;
     @BindView(R.id.login_find_btn) Button loginFindBtn;
     @BindView(R.id.login_signup_btn) Button loginSignupBtn;
-
-
-    private FirebaseAuth.AuthStateListener authStateListener;
-
-
+    private SessionCallback callback;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,22 +64,17 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         // [START initialize_auth]
         firebaseAuth = FirebaseAuth.getInstance();
         // [END initialize_auth]
+        if(getIntent().hasExtra("url")){
+            Log.e(getIntent().getStringExtra("url"));
+        }
 
-        // [START auth_state_listener]
-        authStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.e( "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.e( "onAuthStateChanged:signed_out");
-                }
-            }
-        };
-        // [END auth_state_listener]
+        if(firebaseAuth.getCurrentUser() != null && util.isAutoLogin()){
+            settingUid(firebaseAuth.getCurrentUser().getUid());
+        }
+
+        callback = new SessionCallback();
+        Session.getCurrentSession().addCallback(callback);
+        Session.getCurrentSession().checkAndImplicitOpen();
     }
 
     private void signIn(final String email, final String password) {
@@ -86,58 +83,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         }
 
         showProgressDialog();
-
         // [START sign_in_with_email]
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        getUserQuery(task.getResult().getUser().getUid(), USER_UID).addListenerForSingleValueEvent(
-                                new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        try {
-                                            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-                                            UserClass userClass = dataSnapshot.getValue(UserClass.class);
-                                            userLogin = userClass;
-                                            userLogin.uid = dataSnapshot.getKey();
-                                            if(!userLogin.fcm.equals(refreshedToken)) {
-                                                userLogin.fcm = refreshedToken;
-                                                dataSnapshot.getRef().updateChildren(userLogin.toMap());
-                                            }
-                                            if(userClass.isCouple){
-                                                if(loginAutoCheck.isChecked()){
-                                                    util.setAutoLogin(true);
-                                                    util.setLoginInfo(email,password);
-                                                }else{
-                                                    util.setAutoLogin(false);
-                                                    util.setLoginInfo(email,"");
-                                                }
-                                                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                                                startActivity(intent);
-                                                finish();
-                                            }else if(userClass.isCoupleConnect) {
-                                                Toast.makeText(LoginActivity.this, R.string.toast_couple_wait, Toast.LENGTH_SHORT).show();
-                                            }else{
-                                                if(userClass.couple.isEmpty()){
-                                                    Intent intent = new Intent(LoginActivity.this, CoupleconnectActivity.class);
-                                                    startActivity(intent);
-                                                }else{
-                                                    Intent intent = new Intent(LoginActivity.this, CoupleapplyActivity.class);
-                                                    startActivity(intent);
-                                                }
-                                            }
-                                            hideProgressDialog();
-                                        } catch (Exception e) {
-                                            Log.e( e.getMessage());
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-                                        Log.e( databaseError.toString()+"//"+databaseError.getCode()+"//"+databaseError.getDetails()+"//"+databaseError.getMessage());
-                                    }
-                                });
+                        hideProgressDialog();
+                        settingUid(task.getResult().getUser().getUid());
                     }
                 }).addOnFailureListener(this, new OnFailureListener() {
             @Override
@@ -145,10 +97,63 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 /**
                  * 여기 에러코드를 알아보자 정녕 에러메세지로만 오류를 뿌려줘야할지 고민좀 해보자
                  */
+                hideProgressDialog();
                 Log.e( e.getMessage());
             }
         });
         // [END sign_in_with_email]
+    }
+
+    void settingUid(String uid){
+        showProgressDialog();
+        getUserQuery(uid, USER_UID).addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        try {
+                            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+                            UserClass userClass = dataSnapshot.getValue(UserClass.class);
+                            userLogin = userClass;
+                            userLogin.uid = dataSnapshot.getKey();
+                            if(!userLogin.fcm.equals(refreshedToken)) {
+                                userLogin.fcm = refreshedToken;
+                                dataSnapshot.getRef().updateChildren(userLogin.toMap());
+                            }
+                            if(userClass.isCouple){
+                                if(loginAutoCheck.isChecked()){
+                                    util.setAutoLogin(true);
+                                }else{
+                                    util.setAutoLogin(false);
+                                }
+                                Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
+                                if(getIntent().hasExtra("url"))
+                                    intent.putExtra("url", getIntent().getStringExtra("url"));
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                                LoginActivity.this.finish();
+                            }else if(userClass.isCoupleConnect) {
+                                Toast.makeText(LoginActivity.this, R.string.toast_couple_wait, Toast.LENGTH_SHORT).show();
+                            }else{
+                                if(userClass.couple.isEmpty()){
+                                    Intent intent = new Intent(LoginActivity.this, CoupleconnectActivity.class);
+                                    startActivity(intent);
+                                }else{
+                                    Intent intent = new Intent(LoginActivity.this, CoupleapplyActivity.class);
+                                    startActivity(intent);
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.e( e.getMessage());
+                            e.printStackTrace();
+                        }
+                        hideProgressDialog();
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        hideProgressDialog();
+                        Log.e( databaseError.toString()+"//"+databaseError.getCode()+"//"+databaseError.getDetails()+"//"+databaseError.getMessage());
+                    }
+                });
     }
 
     private boolean validateForm(String email, String password) {
@@ -187,23 +192,31 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
-
-    // [START on_start_add_listener]
     @Override
-    public void onStart() {
-        super.onStart();
-        firebaseAuth.addAuthStateListener(authStateListener);
+    protected void onDestroy() {
+        super.onDestroy();
+        Session.getCurrentSession().removeCallback(callback);
     }
-    // [END on_start_add_listener]
 
-    // [START on_stop_remove_listener]
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (authStateListener != null) {
-            firebaseAuth.removeAuthStateListener(authStateListener);
+    private class SessionCallback implements ISessionCallback {
+
+        @Override
+        public void onSessionOpened() {
+            redirectSignupActivity();
+        }
+
+        @Override
+        public void onSessionOpenFailed(KakaoException exception) {
+            if(exception != null) {
+                exception.printStackTrace();
+                Log.e(exception.toString());
+            }
         }
     }
-    // [END on_stop_remove_listener]
+    protected void redirectSignupActivity() {
+        final Intent intent = new Intent(this, CoupleClass.class);
+        startActivity(intent);
+        finish();
+    }
 
 }

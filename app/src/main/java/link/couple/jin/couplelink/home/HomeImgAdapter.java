@@ -1,5 +1,6 @@
 package link.couple.jin.couplelink.home;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -33,7 +34,7 @@ public class HomeImgAdapter extends PagerAdapter {
         this.context = context;
         this.imageList = imageList;
         this.viewPager = viewPager;
-        mInflater = ((HomeActivity)context).getLayoutInflater();
+        mInflater = ((Activity)context).getLayoutInflater();
     }
 
     @Override

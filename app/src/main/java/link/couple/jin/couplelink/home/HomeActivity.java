@@ -1,8 +1,8 @@
 package link.couple.jin.couplelink.home;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,16 +15,9 @@ import android.widget.TextView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.leocardz.link.preview.library.LinkPreviewCallback;
-import com.leocardz.link.preview.library.SourceContent;
-import com.leocardz.link.preview.library.TextCrawler;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,7 +27,9 @@ import link.couple.jin.couplelink.LoginActivity;
 import link.couple.jin.couplelink.R;
 import link.couple.jin.couplelink.data.CoupleClass;
 import link.couple.jin.couplelink.dialog.WriteDialog;
+import link.couple.jin.couplelink.search.SearchActivity;
 import link.couple.jin.couplelink.service.ClipboardMonitor;
+import link.couple.jin.couplelink.utile.DownloadFilesTask;
 import link.couple.jin.couplelink.utile.Log;
 
 import static link.couple.jin.couplelink.utile.Constant.COUPLE_UID;
@@ -65,6 +60,11 @@ public class HomeActivity extends BaseActivity {
         homeRecycler.setLayoutManager(new LinearLayoutManager(this));
         homeRecycler.setAdapter(homeAdapter);
         settingList();
+        settingList(homeAdapter , classArrayList);
+        if(getIntent().hasExtra("url")){
+            WriteDialog writeDialog = new WriteDialog(this,getIntent().getStringExtra("url"));
+            writeDialog.show();
+        }
 
         startService(new Intent(this, ClipboardMonitor.class));
 
@@ -101,70 +101,17 @@ public class HomeActivity extends BaseActivity {
                 list_cnt = dataSnapshot.getChildrenCount();
                 classArrayList.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    final CoupleClass coupleClass = postSnapshot.getValue(CoupleClass.class);
-                    DownloadFilesTask downloadFilesTask = new DownloadFilesTask(HomeActivity.this);
-                    downloadFilesTask.execute(coupleClass);
+                    CoupleClass coupleClass = postSnapshot.getValue(CoupleClass.class);
+                    classArrayList.add(coupleClass);
                 }
+                DownloadFilesTask downloadFilesTask = new DownloadFilesTask(HomeActivity.this);
+                downloadFilesTask.execute(classArrayList);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 databaseError.toException().printStackTrace();
             }
         });
-    }
-
-    /**
-     * 데이터 수집 후 어댑터 체인
-     * @param coupleClass
-     */
-    public void notifyDataSetChanged(CoupleClass coupleClass){
-        classArrayList.add(coupleClass);
-        if(classArrayList.size() == list_cnt) {
-            homeAdapter.notifyDataSetChanged();
-        }
-    }
-
-    private class DownloadFilesTask extends AsyncTask<CoupleClass,Void,HashMap<String,Object>> {
-
-        HomeActivity homeActivity;
-
-        public DownloadFilesTask(HomeActivity homeActivity){
-            this.homeActivity = homeActivity;
-        }
-
-        @Override
-        protected HashMap<String,Object> doInBackground(CoupleClass... params) {
-            try {
-                HashMap<String,Object> hashMap = util.getImageTag(params[0].link);
-                hashMap.put("couple",params[0]);
-                return  hashMap;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return new HashMap<>();
-        }
-
-        @Override
-        protected void onPostExecute(final HashMap<String, Object> stringObjectHashMap) {
-            final ArrayList<String> arrayList = (ArrayList<String>) stringObjectHashMap.get("array");
-            TextCrawler textCrawler = new TextCrawler();
-            textCrawler.makePreview(new LinkPreviewCallback() {
-                @Override
-                public void onPre() {}
-
-                @Override
-                public void onPos(SourceContent sourceContent, boolean isNull) {
-                    if(!isNull || !sourceContent.getFinalUrl().equals("")){
-                        if(!sourceContent.getImages().isEmpty()) {
-                            arrayList.add(0,sourceContent.getImages().get(0));
-                        }
-                    }
-                    CoupleClass coupleClass = (CoupleClass) stringObjectHashMap.get("couple");
-                    coupleClass.imageList = arrayList;
-                    homeActivity.notifyDataSetChanged(coupleClass);
-                }
-            }, (String) stringObjectHashMap.get("url"));
-        }
     }
 
 
@@ -186,6 +133,9 @@ public class HomeActivity extends BaseActivity {
                     mainDrawerLayout.openDrawer(Gravity.LEFT);
                 break;
             case R.id.fl_search:
+                Intent intent = new Intent(this, SearchActivity.class);
+                intent.putParcelableArrayListExtra("list", classArrayList);
+                startActivity(intent);
                 break;
             case R.id.btn_write:
                 WriteDialog writeDialog = new WriteDialog(this);
