@@ -24,6 +24,11 @@ import com.kakao.auth.ISessionCallback;
 import com.kakao.auth.KakaoAdapter;
 import com.kakao.auth.KakaoSDK;
 import com.kakao.auth.Session;
+import com.kakao.network.ErrorResult;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.LogoutResponseCallback;
+import com.kakao.usermgmt.callback.MeResponseCallback;
+import com.kakao.usermgmt.response.model.UserProfile;
 import com.kakao.util.exception.KakaoException;
 
 import butterknife.BindView;
@@ -68,9 +73,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             Log.e(getIntent().getStringExtra("url"));
         }
 
-        if(firebaseAuth.getCurrentUser() != null && util.isAutoLogin()){
-            settingUid(firebaseAuth.getCurrentUser().getUid());
-        }
+//        if(firebaseAuth.getCurrentUser() != null && util.isAutoLogin()){
+//            settingUid(firebaseAuth.getCurrentUser().getUid());
+//        }
 
         callback = new SessionCallback();
         Session.getCurrentSession().addCallback(callback);
@@ -104,49 +109,29 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         // [END sign_in_with_email]
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (Session.getCurrentSession().handleActivityResult(requestCode, resultCode, data)) {
+            return;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     void settingUid(String uid){
         showProgressDialog();
         getUserQuery(uid, USER_UID).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        try {
-                            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-                            UserClass userClass = dataSnapshot.getValue(UserClass.class);
-                            userLogin = userClass;
-                            userLogin.uid = dataSnapshot.getKey();
-                            if(!userLogin.fcm.equals(refreshedToken)) {
-                                userLogin.fcm = refreshedToken;
-                                dataSnapshot.getRef().updateChildren(userLogin.toMap());
-                            }
-                            if(userClass.isCouple){
-                                if(loginAutoCheck.isChecked()){
-                                    util.setAutoLogin(true);
-                                }else{
-                                    util.setAutoLogin(false);
-                                }
-                                Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
-                                if(getIntent().hasExtra("url"))
-                                    intent.putExtra("url", getIntent().getStringExtra("url"));
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intent);
-                                LoginActivity.this.finish();
-                            }else if(userClass.isCoupleConnect) {
-                                Toast.makeText(LoginActivity.this, R.string.toast_couple_wait, Toast.LENGTH_SHORT).show();
-                            }else{
-                                if(userClass.couple.isEmpty()){
-                                    Intent intent = new Intent(LoginActivity.this, CoupleconnectActivity.class);
-                                    startActivity(intent);
-                                }else{
-                                    Intent intent = new Intent(LoginActivity.this, CoupleapplyActivity.class);
-                                    startActivity(intent);
-                                }
-                            }
-                        } catch (Exception e) {
-                            Log.e( e.getMessage());
-                            e.printStackTrace();
+                        UserClass userClass = dataSnapshot.getValue(UserClass.class);
+                        userClass.uid = dataSnapshot.getKey();
+                        if(!userClass.fcm.equals(refreshedToken)) {
+                            userClass.fcm = refreshedToken;
                         }
-                        hideProgressDialog();
+                        dataSnapshot.getRef().updateChildren(userClass.toMap());
+                        setUserClass(userClass);
+
                     }
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
@@ -154,6 +139,39 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         Log.e( databaseError.toString()+"//"+databaseError.getCode()+"//"+databaseError.getDetails()+"//"+databaseError.getMessage());
                     }
                 });
+    }
+
+    public void setUserClass(UserClass userClass){
+        try {
+            userLogin = userClass;
+            if(userClass.isCouple){
+                if(loginAutoCheck.isChecked()){
+                    util.setAutoLogin(true);
+                }else{
+                    util.setAutoLogin(false);
+                }
+                Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
+                if(getIntent().hasExtra("url"))
+                    intent.putExtra("url", getIntent().getStringExtra("url"));
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                LoginActivity.this.finish();
+            }else if(userClass.isCoupleConnect) {
+                Toast.makeText(LoginActivity.this, R.string.toast_couple_wait, Toast.LENGTH_SHORT).show();
+            }else{
+                if(userClass.couple.isEmpty()){
+                    Intent intent = new Intent(LoginActivity.this, CoupleconnectActivity.class);
+                    startActivity(intent);
+                }else{
+                    Intent intent = new Intent(LoginActivity.this, CoupleapplyActivity.class);
+                    startActivity(intent);
+                }
+            }
+        } catch (Exception e) {
+            Log.e( e.getMessage());
+            e.printStackTrace();
+        }
+        hideProgressDialog();
     }
 
     private boolean validateForm(String email, String password) {
@@ -214,9 +232,42 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         }
     }
     protected void redirectSignupActivity() {
-        final Intent intent = new Intent(this, CoupleClass.class);
-        startActivity(intent);
-        finish();
+        Log.e("로그인");
+        requestMe();
+//        UserManagement.requestLogout(new LogoutResponseCallback() {
+//            @Override
+//            public void onCompleteLogout() {
+//                Log.e("로그아웃");
+//            }
+//        });
     }
 
+    private void requestMe() {
+        UserManagement.requestMe(new MeResponseCallback() {
+            @Override
+            public void onFailure(ErrorResult errorResult) {
+                String message = "failed to get user info. msg=" + errorResult;
+                Log.e(message);
+            }
+
+            @Override
+            public void onSessionClosed(ErrorResult errorResult) {
+            }
+
+            @Override
+            public void onSuccess(UserProfile userProfile) {
+                UserClass userClass = new UserClass(userProfile.getEmail(),userProfile.getNickname(),"",false,false);
+                if(!userClass.fcm.equals(refreshedToken)) {
+                    userClass.fcm = refreshedToken;
+                }
+                getUserQuery(userProfile.getId()+"", USER_UID).getRef().setValue(userClass);
+                userClass.uid = userProfile.getId()+"";
+                setUserClass(userClass);
+            }
+
+            @Override
+            public void onNotSignedUp() {
+            }
+        });
+    }
 }

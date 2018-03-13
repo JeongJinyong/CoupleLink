@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -24,6 +25,7 @@ import link.couple.jin.couplelink.data.UserClass;
 import link.couple.jin.couplelink.utile.Log;
 import link.couple.jin.couplelink.utile.Util;
 
+import static com.kakao.util.helper.Utility.getPackageInfo;
 import static link.couple.jin.couplelink.utile.Constant.COUPLE_UID;
 import static link.couple.jin.couplelink.utile.Constant.TITLE;
 import static link.couple.jin.couplelink.utile.Constant.USER_COUPLE;
@@ -46,6 +48,7 @@ public class BaseActivity extends Activity implements MainInterface {
     public ArrayList<CoupleClass> classArrayList = new ArrayList<>();
     public RecyclerView.Adapter adapter;
 
+    String refreshedToken;
     public BaseActivity(){
 
     }
@@ -61,18 +64,16 @@ public class BaseActivity extends Activity implements MainInterface {
         util = new Util(this);
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
-
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo("link.couple.jin.couplelink", PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
+        refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        PackageInfo packageInfo = getPackageInfo(this, PackageManager.GET_SIGNATURES);
+        for (Signature signature : packageInfo.signatures) {
+            try {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
-                Log.d(Base64.encodeToString(md.digest(), Base64.DEFAULT));
+                Log.e(Base64.encodeToString(md.digest(), Base64.NO_WRAP));
+            } catch (NoSuchAlgorithmException e) {
+                Log.w("Unable to get MessageDigest. signature=" + signature);
             }
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
         }
 
         ClipboardManager clipBoard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);

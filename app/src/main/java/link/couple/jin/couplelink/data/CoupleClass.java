@@ -53,7 +53,7 @@ public class CoupleClass implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(Parcel dest, int flags){
         dest.writeStringList(imageList);
         dest.writeString(link);
         dest.writeString(date);
